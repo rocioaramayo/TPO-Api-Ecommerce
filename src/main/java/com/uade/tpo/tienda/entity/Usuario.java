@@ -17,10 +17,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data                     // Genera getters, setters, equals, hashCode y toString
-@NoArgsConstructor        // Genera un constructor sin argumentos (requerido por JPA)
-@AllArgsConstructor       // Genera un constructor con argumentos para todos los campos
-@Builder                 // Implementa el patrón Builder para crear instancias de forma fluida
+@Data
+@NoArgsConstructor 
+@AllArgsConstructor
+@Builder 
 @Entity
 public class Usuario {
   @Id
