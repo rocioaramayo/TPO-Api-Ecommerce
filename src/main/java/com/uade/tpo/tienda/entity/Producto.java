@@ -10,6 +10,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -42,10 +44,20 @@ public class Producto {
     @Column(nullable = false)
     private Integer stock;
 
+    @ManyToOne
+    @JoinColumn(name ="vendedor_id", nullable = false)
+    private Usuario vendedor;
+
+    //un producto tiene muhas fotografias
     @OneToMany (mappedBy = "producto",cascade = CascadeType.ALL,orphanRemoval = true)
     private List<FotoProducto> fotos;
 
-    
+    //muchos productos pertenecen a una categoria
+    @ManyToOne
+    @JoinColumn(name = "categoria_id", nullable= false)
+    private Categoria categoria;
+
+
     @CreationTimestamp
     @Column(name = "created_at")
     private LocalDateTime createdAt;
