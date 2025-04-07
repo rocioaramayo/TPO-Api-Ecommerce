@@ -12,15 +12,16 @@ import jakarta.persistence.Id;
 
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
-
-
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Data
+@Data                     // Genera getters, setters, equals, hashCode y toString
+@NoArgsConstructor        // Genera un constructor sin argumentos (requerido por JPA)
+@AllArgsConstructor       // Genera un constructor con argumentos para todos los campos
+@Builder                 // Implementa el patrón Builder para crear instancias de forma fluida
 @Entity
-@Builder//es para la creacion distinta
-
 public class Usuario {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
