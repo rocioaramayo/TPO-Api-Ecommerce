@@ -1,42 +1,52 @@
 package com.uade.tpo.tienda.entity;
-import  com.uade.tpo.tienda.enums.*;
-import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Data;
-import java.time.LocalTime;
+import com.uade.tpo.tienda.enums.*;
+import java.time.LocalDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
 
-@Data
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data                     // Genera getters, setters, equals, hashCode y toString
+@NoArgsConstructor        // Genera un constructor sin argumentos (requerido por JPA)
+@AllArgsConstructor       // Genera un constructor con argumentos para todos los campos
+@Builder                 // Implementa el patrón Builder para crear instancias de forma fluida
 @Entity
-@Builder // para creaccion distinta
-
 public class Usuario {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long Id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
+  //no puede estar vacia y debe ser unica
+  @Column(nullable = false, unique = true)
+  private String username;
 
-    @Column(nullable = false, unique = true)// no deja q estre vacio y se sea unico
-    private String username;
+  @Column(nullable = false, unique = true)
+  private String email;
 
-    @Column(nullable = false, unique = true)// no deja q estre vacio y se sea unico
-    private String email;
+  @Column(nullable = false)
+  private String password;
 
-    @Column(nullable = false)
-    private String password;
+  @Column(name = "first_name", nullable = false)
+  private String firstName;
 
-    @Column(name = "first_name", nullable = false)
-    private String firstName;
+  @Column(name = "last_name", nullable = false)
+  private String lastName;
 
-    @Column(name = "last_name", nullable = false)
-    private String lastName;
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private Role role;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Role role;
-
-    @CreationTimestamp
-    @Column(name = "created_at")
-    private LocalTime createdAT;
+  @CreationTimestamp
+  @Column(name= "created_at")
+  private LocalDateTime createdAT;
 }
