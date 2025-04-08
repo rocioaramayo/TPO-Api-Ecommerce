@@ -1,4 +1,4 @@
-package com.uade.tpo.tienda.service;
+package com.uade.tpo.tienda.service.usuario;
 
 import java.util.List;
 import java.util.Optional;
