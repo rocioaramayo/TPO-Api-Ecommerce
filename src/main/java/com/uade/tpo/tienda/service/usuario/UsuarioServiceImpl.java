@@ -1,8 +1,9 @@
-package com.uade.tpo.tienda.service;
+package com.uade.tpo.tienda.service.usuario;
 
 import com.uade.tpo.tienda.entity.Usuario;
 import com.uade.tpo.tienda.enums.Role;
 import com.uade.tpo.tienda.repository.UsuarioRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
