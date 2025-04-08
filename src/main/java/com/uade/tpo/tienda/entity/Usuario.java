@@ -1,6 +1,7 @@
 package com.uade.tpo.tienda.entity;
 import com.uade.tpo.tienda.enums.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -52,5 +53,5 @@ public class Usuario {
   private LocalDateTime createdAT;
 
   @OneToMany(mappedBy = "vendedor", cascade = CascadeType.ALL , orphanRemoval = true)
-  private Producto producto;
+  private List<Producto> productos;
 }

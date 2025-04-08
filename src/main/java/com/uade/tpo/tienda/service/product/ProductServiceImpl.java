@@ -5,17 +5,21 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
 
 import com.uade.tpo.tienda.entity.Producto;
 import com.uade.tpo.tienda.repository.ProductRepository;
-
+@Service
 public class ProductServiceImpl implements ProductService{
   @Autowired
   private ProductRepository productRepository;
 
   @Override
-  public Producto createProduct(Producto product) {
-    return productRepository.save(product);
+  public Producto createProduct(Producto producto) {
+    if (producto.getFotos() != null) {
+      producto.getFotos().forEach(foto -> foto.setProducto(producto));
+  }
+  return productRepository.save(producto);
   }
 
   @Override
