@@ -18,8 +18,10 @@ public class ProductServiceImpl implements ProductService{
   public Producto createProduct(Producto producto) {
     if (producto.getFotos() != null) {
       producto.getFotos().forEach(foto -> foto.setProducto(producto));
-  }
-  return productRepository.save(producto);
+      return productRepository.save(producto);
+  }// agregar si no sube con fotos no dejar 
+    throw new RuntimeException("Producto no se puede crear sin imagenes ");
+
   }   
 
   @Override
@@ -38,7 +40,7 @@ public class ProductServiceImpl implements ProductService{
         existing.setPrecio(productoUpdated.getPrecio());
         existing.setStock(productoUpdated.getStock());
         existing.setCategoria(productoUpdated.getCategoria());
-        existing.setVendedor(productoUpdated.getVendedor());
+        //existing.setVendedor(productoUpdated.getVendedor());
         // se puedes actualizar la lista 
         existing.setFotos(productoUpdated.getFotos());
         
