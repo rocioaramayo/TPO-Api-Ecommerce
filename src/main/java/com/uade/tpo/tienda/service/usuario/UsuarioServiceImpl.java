@@ -34,7 +34,6 @@ public class UsuarioServiceImpl implements UsuarioService {
             throw new IllegalArgumentException("La contraseña debe tener al menos 8 caracteres");
         }
         
-        // Encriptar la contraseña usando PasswordEncoder (por ejemplo, BCrypt)
         usuario.setPassword(usuario.getPassword());
         
         // Si no se especifica un rol, se puede asignar uno por defecto (ejemplo: COMPRADOR)

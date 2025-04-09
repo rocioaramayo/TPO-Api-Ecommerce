@@ -53,5 +53,5 @@ public class Usuario {
   private LocalDateTime createdAT;
 
   @OneToMany(mappedBy = "vendedor", cascade = CascadeType.ALL ,orphanRemoval = true)
-private List<Producto> producto;
+private List<Producto> productos;
 }
