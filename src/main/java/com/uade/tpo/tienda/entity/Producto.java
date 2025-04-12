@@ -46,8 +46,9 @@ public class Producto {
     private Integer stock;
 
     // muchos productos pueden ser publicados por el mismo usuario
-    //@JoinColumn(name="vendedor_id", nullable=false)
-    //private Usuario vendedor;
+    @ManyToOne
+    @JoinColumn(name="vendedor_id", nullable=false)
+    private Usuario vendedor;
 
     //un producto tiene muchas fotografias
     @OneToMany(mappedBy = "producto",cascade= CascadeType.ALL, orphanRemoval = true)
