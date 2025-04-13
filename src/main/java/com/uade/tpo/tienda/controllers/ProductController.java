@@ -95,20 +95,20 @@ public class ProductController {
 
   // listar productos
   @GetMapping
-public ResponseEntity<Page<ProductResponse>> getProducts(
-        @RequestParam(required = false) Integer page,
-        @RequestParam(required = false) Integer size) {
-    Page<Producto> productos;
-    if (page == null || size == null) {
-        productos = productService.getProducts(PageRequest.of(0, Integer.MAX_VALUE));
-    } else {
-        productos = productService.getProducts(PageRequest.of(page, size));
-    }
-    // Mapear cada producto a ProductResponse usando el método mapToProductResponse()
-    Page<ProductResponse> responsePage = productos.map(this::mapToProductResponse);
-    return ResponseEntity.ok(responsePage);
-}
-
+  public ResponseEntity<Page<ProductResponse>> getProducts(
+          @RequestParam(required = false) Integer page,
+          @RequestParam(required = false) Integer size) {
+      Page<Producto> productos;
+      if (page == null || size == null) {
+          productos = productService.getProducts(PageRequest.of(0, Integer.MAX_VALUE));
+      } else {
+          productos = productService.getProducts(PageRequest.of(page, size));
+      }
+      
+      // mapeo Producto a ProductResponse
+      Page<ProductResponse> responsePage = productos.map(this::mapToProductResponse);
+      return ResponseEntity.ok(responsePage);
+  }
   @DeleteMapping("/{id}")
   public ResponseEntity<Void> deleteProduct(@PathVariable Long id){
     productService.deleteProduct(id);
