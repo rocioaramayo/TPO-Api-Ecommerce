@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.uade.tpo.tienda.dto.UserRequest;
 import com.uade.tpo.tienda.entity.Usuario;
 import com.uade.tpo.tienda.service.usuario.UsuarioService;
 
@@ -26,10 +27,21 @@ public class UsuarioController {
   private UsuarioService usuarioService;
 
   @PostMapping
-  public ResponseEntity<Usuario> crearUsuario(@RequestBody Usuario Usuario) {
-    Usuario nueUsuario = usuarioService.crearUsuario(Usuario);
-      
-      return ResponseEntity.ok(nueUsuario);
+  public ResponseEntity<Usuario> crearUsuario(@RequestBody UserRequest request) {
+      // Convertir el DTO a la entidad Usuario
+      Usuario usuario = Usuario.builder()
+        .username(request.getUsername())
+        .email(request.getEmail())
+        .password(request.getPassword()) // Considera encriptar la contraseña en el servicio
+        .firstName(request.getFirstName())
+        .lastName(request.getLastName())
+        .role(request.getRole())
+        .build();
+
+      Usuario nueUsuario = usuarioService.crearUsuario(usuario);
+
+   
+      return ResponseEntity.ok(nueUsuario );
   }
   @GetMapping("/{id}")
   public ResponseEntity<Usuario> obtenerUsuarioPorId(@PathVariable Long id){

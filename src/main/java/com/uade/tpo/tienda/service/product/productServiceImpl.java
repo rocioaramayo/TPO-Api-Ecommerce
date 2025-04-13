@@ -18,8 +18,9 @@ public class productServiceImpl implements ProductService {
     public Producto createProduct(Producto producto) {
         if (producto.getFotos() != null) {
             producto.getFotos().forEach(foto -> foto.setProducto(producto));
+            return productRepository.save(producto);
         }
-        return productRepository.save(producto);
+        throw new RuntimeException("Producto no se puede crear sin imagenes ");
     }
 
     @Override
