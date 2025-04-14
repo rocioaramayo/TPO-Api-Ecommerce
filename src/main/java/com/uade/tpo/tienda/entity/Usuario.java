@@ -2,9 +2,12 @@ package com.uade.tpo.tienda.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.uade.tpo.tienda.enums.*;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -25,7 +28,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder 
 @Entity
-public class Usuario {
+public class Usuario implements UserDetails{
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
@@ -56,4 +59,10 @@ public class Usuario {
   @OneToMany(mappedBy = "vendedor", cascade = CascadeType.ALL ,orphanRemoval = true)
   @JsonIgnore
 private List<Producto> productos;
+
+  @Override
+  public Collection<? extends GrantedAuthority> getAuthorities() {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'getAuthorities'");
+  }
 }
