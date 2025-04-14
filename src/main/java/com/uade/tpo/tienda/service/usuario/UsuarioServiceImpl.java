@@ -3,6 +3,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.uade.tpo.tienda.entity.Usuario;
@@ -14,6 +15,9 @@ public class UsuarioServiceImpl implements UsuarioService{
 
   @Autowired
   private UsuarioRepository usuarioRepository;
+  @Autowired
+  private PasswordEncoder passwordEncoder;
+
   @Override
   public Usuario crearUsuario(Usuario usuario) {
     // Validar que el nombre de usuario no esté en uso
@@ -31,7 +35,8 @@ public class UsuarioServiceImpl implements UsuarioService{
         throw new IllegalArgumentException("La contraseña debe tener al menos 8 caracteres");
     }
     
-    usuario.setPassword(usuario.getPassword());
+    usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
+
     
     // Si no se especifica un rol, se puede asignar uno por defecto (ejemplo: COMPRADOR)
     if (usuario.getRole() == null) {
@@ -66,7 +71,7 @@ public class UsuarioServiceImpl implements UsuarioService{
         usuarioExistente.setRole(usuario.getRole());
          // Actualiza la contraseña solo si se envía una nueva y no es vacía
          if (usuario.getPassword() != null && !usuario.getPassword().isEmpty()) {
-          usuarioExistente.setPassword(usuario.getPassword());
+          usuarioExistente.setPassword(passwordEncoder.encode(usuario.getPassword()));
       }
         return usuarioRepository.save(usuarioExistente);
     }
