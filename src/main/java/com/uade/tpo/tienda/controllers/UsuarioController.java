@@ -26,23 +26,23 @@ public class UsuarioController {
   @Autowired
   private UsuarioService usuarioService;
 
-  @PostMapping
-  public ResponseEntity<Usuario> crearUsuario(@RequestBody UserRequest request) {
-      // Convertir el DTO a la entidad Usuario
-      Usuario usuario = Usuario.builder()
-        .username(request.getUsername())
-        .email(request.getEmail())
-        .password(request.getPassword()) // Considera encriptar la contraseña en el servicio
-        .firstName(request.getFirstName())
-        .lastName(request.getLastName())
-        .role(request.getRole())
-        .build();
+  // @PostMapping
+  // public ResponseEntity<Usuario> crearUsuario(@RequestBody UserRequest request) {
+  //     // Convertir el DTO a la entidad Usuario
+  //     Usuario usuario = Usuario.builder()
+  //       .username(request.getUsername())
+  //       .email(request.getEmail())
+  //       .password(request.getPassword()) // Considera encriptar la contraseña en el servicio
+  //       .firstName(request.getFirstName())
+  //       .lastName(request.getLastName())
+  //       .role(request.getRole())
+  //       .build();
 
-      Usuario nueUsuario = usuarioService.crearUsuario(usuario);
+  //     Usuario nueUsuario = usuarioService.crearUsuario(usuario);
 
    
-      return ResponseEntity.ok(nueUsuario );
-  }
+  //     return ResponseEntity.ok(nueUsuario );
+  // }
   @GetMapping("/{id}")
   public ResponseEntity<Usuario> obtenerUsuarioPorId(@PathVariable Long id){
     Optional<Usuario> usuarioOpt = usuarioService.obtenerUsuarioPorId(id);
