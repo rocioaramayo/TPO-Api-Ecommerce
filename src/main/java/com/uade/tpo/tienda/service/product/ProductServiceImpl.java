@@ -1,36 +1,57 @@
 package com.uade.tpo.tienda.service.product;
 
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.uade.tpo.tienda.entity.Producto;
-
+import com.uade.tpo.tienda.repository.ProductRepository;
 @Service
 public class ProductServiceImpl implements ProductService{
+  @Autowired
+  private ProductRepository productRepository;
 
-    @Override
-    public Producto createProduct(Producto product) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'createProduct'");
-    }
+  @Override
+  public Producto createProduct(Producto producto) {
+    if (producto.getFotos() != null) {
+      producto.getFotos().forEach(foto -> foto.setProducto(producto));
+      return productRepository.save(producto);
+  }// agregar si no sube con fotos no dejar 
+    throw new RuntimeException("Producto no se puede crear sin imagenes ");
 
-    @Override
-    public Page<Producto> getProducts(Pageable pageable) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getProducts'");
-    }
+  }   
 
-    @Override
-    public Producto updateProduct(Long id, Producto productoUpdated) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateProduct'");
-    }
+  @Override
+  public Page<Producto> getProducts(Pageable pageable) {
+    return productRepository.findByStockGreaterThan(0, pageable);
+  }
 
-    @Override
-    public void deleteProduct(Long id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteProduct'");
+  @Override
+  public Producto updateProduct(Long id, Producto productoUpdated) {
+    Optional<Producto> optionalProducto = productRepository.findById(id);
+    if(optionalProducto.isPresent()){
+        Producto existing = optionalProducto.get();
+        // actualizamos los campos 
+        existing.setNombre(productoUpdated.getNombre());
+        existing.setDescripcion(productoUpdated.getDescripcion());
+        existing.setPrecio(productoUpdated.getPrecio());
+        existing.setStock(productoUpdated.getStock());
+        existing.setCategoria(productoUpdated.getCategoria());
+        existing.setVendedor(productoUpdated.getVendedor());
+        // se puedes actualizar la lista 
+        existing.setFotos(productoUpdated.getFotos());
+        
+        return productRepository.save(existing);
     }
     
+    throw new RuntimeException("Producto no encontrado con id: " + id);
+}
+  @Override
+  public void deleteProduct(Long id) {
+    productRepository.deleteById(id);
+  }
+  
 }
