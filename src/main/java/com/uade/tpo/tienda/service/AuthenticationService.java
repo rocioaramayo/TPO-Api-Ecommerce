@@ -10,11 +10,11 @@ import org.springframework.stereotype.Service;
 import com.uade.tpo.tienda.controllers.auth.AuthenticationRequest;
 import com.uade.tpo.tienda.controllers.auth.AuthenticationResponse;
 import com.uade.tpo.tienda.controllers.auth.RegisterRequest;
-import com.uade.tpo.tienda.controllers.config.JwtService;
+import com.uade.tpo.tienda.config.JwtService;
 import com.uade.tpo.tienda.entity.Usuario;
 import com.uade.tpo.tienda.repository.UsuarioRepository;
-
 import lombok.RequiredArgsConstructor;
+
 
 @Service
 @RequiredArgsConstructor
