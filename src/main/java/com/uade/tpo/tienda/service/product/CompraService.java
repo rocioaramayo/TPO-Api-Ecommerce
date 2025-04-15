@@ -1,5 +1,6 @@
 package com.uade.tpo.tienda.service.product;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,9 +9,12 @@ import org.springframework.stereotype.Service;
 import com.uade.tpo.tienda.dto.CompraItemRequest;
 import com.uade.tpo.tienda.dto.CompraRequest;
 import com.uade.tpo.tienda.entity.Compra;
+import com.uade.tpo.tienda.entity.CompraItem;
 import com.uade.tpo.tienda.entity.Producto;
+import com.uade.tpo.tienda.entity.Usuario;
 import com.uade.tpo.tienda.repository.CompraRepository;
 import com.uade.tpo.tienda.repository.ProductRepository;
+import com.uade.tpo.tienda.repository.UsuarioRepository;
 
 import jakarta.transaction.Transactional;
 
@@ -18,36 +22,50 @@ import jakarta.transaction.Transactional;
 @RequiredArgsConstructor
 public class CompraService {
 
-    private final ProductRepository productoRepository = null;
-    private final CompraRepository compraRepository = null;
+    private final ProductRepository productoRepository; // No inicializar con null
+    private final CompraRepository compraRepository; // No inicializar con null
+    private final UsuarioRepository usuarioRepository; // No inicializar con null
 
     @Transactional
     public void procesarCompra(CompraRequest request) {
-        List<Compra> items = new ArrayList<>();
+        // Lista de ítems de compra (CompraItem)
+        List<CompraItem> items = new ArrayList<>();
 
+        // Buscamos el usuario con el ID proporcionado
+        Usuario usuario = usuarioRepository.findById(request.getUsuarioId())
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        // Iteramos sobre cada item de la compra en la request
         for (CompraItemRequest itemReq : request.getItems()) {
+            // Buscamos el producto correspondiente
             Producto producto = productoRepository.findById(itemReq.getProductoId())
                 .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
 
+            // Comprobamos si hay suficiente stock
             if (producto.getStock() < itemReq.getCantidad()) {
                 throw new RuntimeException("Stock insuficiente para " + producto.getNombre());
             }
 
+            // Reducimos el stock del producto
             producto.setStock(producto.getStock() - itemReq.getCantidad());
             productoRepository.save(producto);
 
-            Compra item = new Compra();
+            // Creamos un CompraItem para el ítem de la compra
+            CompraItem item = new CompraItem();
             item.setProducto(producto);
             item.setCantidad(itemReq.getCantidad());
+
+            // Asignamos el CompraItem a la lista de ítems
             items.add(item);
         }
 
+        // Creamos una nueva compra
         Compra compra = new Compra();
-        compra.setUsuarioId(request.getUsuarioId());
-        compra.setItems(items);
         compra.setFecha(LocalDateTime.now());
+        compra.setItems(items);
+        compra.setUsuario(usuario); // Asignamos el usuario encontrado en la base de datos
 
+        // Guardamos la compra en el repositorio
         compraRepository.save(compra);
     }
 }
-

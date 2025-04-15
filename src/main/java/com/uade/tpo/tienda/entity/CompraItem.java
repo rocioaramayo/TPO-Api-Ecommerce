@@ -1,31 +1,54 @@
 package com.uade.tpo.tienda.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
 
 @Entity
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class CompraItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Relación con la compra (muchos ítems pueden pertenecer a una compra)
-    @ManyToOne
-    @JoinColumn(name = "compra_id")
-    private Compra compra;
+    private Integer cantidad;
 
-    // Relación con el producto (cada ítem hace referencia a un producto)
     @ManyToOne
     @JoinColumn(name = "producto_id")
     private Producto producto;
 
-    private Integer cantidad;
+    @ManyToOne
+    @JoinColumn(name = "compra_id")
+    private Compra compra;
 
-    private Double precioUnitario; // opcional: por si querés guardar cuánto valía ese producto en ese momento
+    // Getters y setters generados por Lombok o manualmente
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Integer getCantidad() {
+        return cantidad;
+    }
+
+    public void setCantidad(Integer cantidad) {
+        this.cantidad = cantidad;
+    }
+
+    public Producto getProducto() {
+        return producto;
+    }
+
+    public void setProducto(Producto producto) {
+        this.producto = producto;
+    }
+
+    public Compra getCompra() {
+        return compra;
+    }
+
+    public void setCompra(Compra compra) {
+        this.compra = compra; // Asignar la compra al ítem
+    }
 }
-

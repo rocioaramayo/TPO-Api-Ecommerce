@@ -1,6 +1,5 @@
 package com.uade.tpo.tienda.entity;
 
-
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -30,5 +29,45 @@ public class Compra {
     @ManyToOne
     @JoinColumn(name = "usuario_id")
     private Usuario usuario;
-}
 
+    // Getters y setters generados por Lombok o manualmente
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public LocalDateTime getFecha() {
+        return fecha;
+    }
+
+    public void setFecha(LocalDateTime fecha) {
+        this.fecha = fecha;
+    }
+
+    public Double getTotal() {
+        return total;
+    }
+
+    public void setTotal(Double total) {
+        this.total = total;
+    }
+
+    public List<CompraItem> getItems() {
+        return items;
+    }
+
+    public void setItems(List<CompraItem> items) {
+        this.items = items;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario; // Cambiado de setUsuarioId a setUsuario
+    }
+}
