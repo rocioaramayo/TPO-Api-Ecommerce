@@ -1,13 +1,10 @@
 package com.uade.tpo.tienda.entity;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.uade.tpo.tienda.enums.*;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -16,6 +13,10 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import lombok.AllArgsConstructor;
@@ -23,12 +24,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
-@NoArgsConstructor 
-@AllArgsConstructor
-@Builder 
+@Data                    
+@NoArgsConstructor        // Genera un constructor sin argumentos (requerido por JPA)
+@AllArgsConstructor       // Genera un constructor con argumentos para todos los campos
+@Builder                 
 @Entity
-public class Usuario implements UserDetails{
+public class Usuario implements UserDetails {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
@@ -56,13 +57,38 @@ public class Usuario implements UserDetails{
   @Column(name= "created_at")
   private LocalDateTime createdAT;
 
-  @OneToMany(mappedBy = "vendedor", cascade = CascadeType.ALL ,orphanRemoval = true)
-  @JsonIgnore
-private List<Producto> productos;
 
-  @Override
-  public Collection<? extends GrantedAuthority> getAuthorities() {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'getAuthorities'");
-  }
+  @OneToMany(mappedBy = "vendedor", cascade = CascadeType.ALL , orphanRemoval = true)
+  private List<Producto> productos;
+  
+@Override
+public Collection<? extends GrantedAuthority> getAuthorities() {
+    return List.of(() -> role.name());
+}
+
+@Override
+public String getUsername() {
+    return email; // o username si querés
+}
+
+@Override
+public boolean isAccountNonExpired() {
+    return true;
+}
+
+@Override
+public boolean isAccountNonLocked() {
+    return true;
+}
+
+@Override
+public boolean isCredentialsNonExpired() {
+    return true;
+}
+
+@Override
+public boolean isEnabled() {
+    return true;
+}
+
 }
