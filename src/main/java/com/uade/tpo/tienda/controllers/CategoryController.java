@@ -15,12 +15,17 @@ public class CategoryController {
 
     @Autowired
     private CategoryService categoryService;
+
+    /**
+     * Endpoint para crear una categoría.
+     * Recibe en el body un JSON con los campos 'nombre' y 'descripcion'.
+     */
     @PostMapping("/create")
     public ResponseEntity<Categoria> createCategory(@RequestBody CategoryRequest request) {
         // Construir la entidad Categoria usando el builder de Lombok
         Categoria category = Categoria.builder()
                 .nombre(request.getNombre())
-                .descripcion(request.getDescipcion())
+                .descripcion(request.getDescripcion())
                 .build();
 
         // Llamar al servicio para guardar la categoría

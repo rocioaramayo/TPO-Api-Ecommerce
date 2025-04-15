@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PhotoRequest {
-    private String url;
-    private String descripcion;
+public class AuthenticationResponse {
+    private String token;
 }

@@ -11,12 +11,11 @@ public class CategoryServiceImpl implements CategoryService {
     
     @Autowired
     private CategoryRepository categoryRepository;
-
+    
     @Override
     public Categoria createCategory(Categoria category) {
         return categoryRepository.save(category);
     }
-    
     @Override
     public Optional<Categoria> getCategoryById(Long id) {
         return categoryRepository.findById(id);

@@ -5,8 +5,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface ProductService {
-    Producto createProduct(Producto product);
-    Page<Producto> getProducts(Pageable pageable);
-    Producto updateProducto (long id ,Producto productoUpdated);
-    void deleteProduct(Long id);
+  Producto createProduct(Producto product);
+  Page<Producto> getProducts(Pageable pageable);
+  Producto updateProduct(Long id, Producto productoUpdated);
+  void deleteProduct(Long id);
 }

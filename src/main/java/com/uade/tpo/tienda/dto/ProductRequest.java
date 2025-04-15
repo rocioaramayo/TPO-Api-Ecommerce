@@ -17,5 +17,5 @@ public class ProductRequest {
     private int stock;
     private Long categoryId;  // ID de la categoría a la que pertenece el producto
     private Long vendedorId;  // ID del vendedor (usuario) que crea el producto
-    private List<PhotoRequest> fotos; // Lista de fotos a asociar al producto
+    private List<PhotoRequest> fotos; // Lista de fotos a asociar al productos
 }
