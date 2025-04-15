@@ -90,8 +90,14 @@ public class ProductController {
         // 6. Mapear el producto creado a un DTO de salida
         ProductResponse response = mapToProductResponse(created);
         return ResponseEntity.created(URI.create("/productos/" + created.getId())).body(response);
+        
     }
-
+    @GetMapping("/detalle/{id}")
+    public ResponseEntity<ProductResponse> getProductDetail(@PathVariable Long id) {
+        Optional<Producto> productoOpt = productService.getProductById(id);
+        return productoOpt.map(p -> ResponseEntity.ok(mapToProductResponse(p)))
+                          .orElse(ResponseEntity.notFound().build());
+    }
 
   // listar productos
   @GetMapping
@@ -146,6 +152,19 @@ public class ProductController {
             .fotos(photoResponses)
             .createdAt(producto.getCreatedAt())
             .build();
+}
+@GetMapping("/filtrar")
+public ResponseEntity<List<ProductResponse>> filtrarProductos(
+        @RequestParam(required = false) String nombre,
+        @RequestParam(required = false) String categoria,
+        @RequestParam(required = false) Double precioMax) {
+
+    List<Producto> productosFiltrados = productService.filtrarProductos(nombre, categoria, precioMax);
+    List<ProductResponse> response = productosFiltrados.stream()
+        .map(this::mapToProductResponse)
+        .toList();
+
+    return ResponseEntity.ok(response);
 }
 
 }
