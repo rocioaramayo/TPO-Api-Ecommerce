@@ -32,9 +32,6 @@ public class Producto {
     @Column(nullable = false)
     private Integer stock;
 
-    @ManyToOne
-    @JoinColumn(name="vendedor_id", nullable=false)
-    private Usuario vendedor;
 
     @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FotoProducto> fotos;
