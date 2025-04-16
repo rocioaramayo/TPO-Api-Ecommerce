@@ -30,26 +30,30 @@ public class SecurityConfig {
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(req -> req
 
-                // Públicos
+                // Endpoints públicos
                 .requestMatchers("/api/v1/auth/**", "/error/**").permitAll()
 
-                // Usuarios: solo ADMIN
+                // Gestión de usuarios - Solo ADMIN
                 .requestMatchers("/usuarios/**").hasAuthority(Role.ADMIN.name())
+
+                // falta endpoints compra permitir compradores 
+                // y q solo admin tegno axcceso a ordenes de compra y item consultar 
 
                 // Categorías
                 .requestMatchers("/categories/create").hasAuthority(Role.ADMIN.name())
-                .requestMatchers("/categories/**").authenticated()
+                //ver si damos acceso a comprador a acceder a una cateria en aparticular , poner comprador 
+                .requestMatchers("/categories/**").permitAll()
 
-                // Productos (lectura): COMPRADOR, VENDEDOR y ADMIN
-                .requestMatchers(HttpMethod.GET, "/productos/**")
-                    .hasAnyAuthority(Role.COMPRADOR.name(), Role.VENDEDOR.name(), Role.ADMIN.name())
+                // Productos - ADMIN puede crear, actualizar, borrar
+                .requestMatchers(HttpMethod.POST, "/productos").hasAuthority(Role.ADMIN.name())
+                .requestMatchers(HttpMethod.PUT, "/productos/**").hasAuthority(Role.ADMIN.name())
+                .requestMatchers(HttpMethod.DELETE, "/productos/**").hasAuthority(Role.ADMIN.name())
 
-                // Productos (creación, edición, borrado): solo VENDEDOR
-                .requestMatchers(HttpMethod.POST, "/productos").hasAuthority(Role.VENDEDOR.name())
-                .requestMatchers(HttpMethod.PUT, "/productos/**").hasAuthority(Role.VENDEDOR.name())
-                .requestMatchers(HttpMethod.DELETE, "/productos/**").hasAuthority(Role.VENDEDOR.name())
+                // Productos - sin estar autentitco pueden consultar y filtrar productos 
+                .requestMatchers(HttpMethod.GET, "/productos/**").permitAll()
 
-                // Cualquier otro endpoint requiere estar autenticado
+                // Cualquier otra petición requiere estar autenticado
+
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))

@@ -16,4 +16,5 @@ public interface ProductService {
   Optional<Producto> getProductById(Long id);
   List<Producto> filtrarProductos(String nombre, String categoria, Double precioMax);
 
+
 }

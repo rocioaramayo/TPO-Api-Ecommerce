@@ -1,5 +1,6 @@
 package com.uade.tpo.tienda.service.category;
 
+import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,5 +20,9 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public Optional<Categoria> getCategoryById(Long id) {
         return categoryRepository.findById(id);
+    }
+    @Override
+    public List<Categoria> getCategory() {
+        return categoryRepository.findAll();
     }
 }

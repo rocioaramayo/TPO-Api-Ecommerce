@@ -41,7 +41,6 @@ public class ProductServiceImpl implements ProductService{
         existing.setPrecio(productoUpdated.getPrecio());
         existing.setStock(productoUpdated.getStock());
         existing.setCategoria(productoUpdated.getCategoria());
-        existing.setVendedor(productoUpdated.getVendedor());
         // se puedes actualizar la lista 
         existing.setFotos(productoUpdated.getFotos());
         
@@ -54,6 +53,22 @@ public class ProductServiceImpl implements ProductService{
   public void deleteProduct(Long id) {
     productRepository.deleteById(id);
   }
+  @Override
+public Optional<Producto> getProductById(Long id) {
+    return productRepository.findById(id);
+}
+@Override
+public List<Producto> filtrarProductos(String nombre, String categoria, Double precioMax) {
+    List<Producto> productos = productRepository.findAll();
+
+    return productos.stream()
+        .filter(p -> (nombre == null || p.getNombre().toLowerCase().contains(nombre.toLowerCase())))
+        .filter(p -> (categoria == null || p.getCategoria().getNombre().equalsIgnoreCase(categoria)))
+        .filter(p -> (precioMax == null || p.getPrecio() <= precioMax))
+        .filter(p -> p.getStock() > 0) // solo si tiene  stock
+        .toList();
+}
+
   
   @Override
 public Optional<Producto> getProductById(Long id) {
