@@ -41,7 +41,6 @@ public class ProductServiceImpl implements ProductService{
         existing.setPrecio(productoUpdated.getPrecio());
         existing.setStock(productoUpdated.getStock());
         existing.setCategoria(productoUpdated.getCategoria());
-        existing.setVendedor(productoUpdated.getVendedor());
         // se puedes actualizar la lista 
         existing.setFotos(productoUpdated.getFotos());
         

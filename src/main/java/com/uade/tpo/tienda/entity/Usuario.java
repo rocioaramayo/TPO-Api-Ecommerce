@@ -6,13 +6,11 @@ import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -58,8 +56,6 @@ public class Usuario implements UserDetails {
   private LocalDateTime createdAT;
 
 
-  @OneToMany(mappedBy = "vendedor", cascade = CascadeType.ALL , orphanRemoval = true)
-  private List<Producto> productos;
   
 @Override
 public Collection<? extends GrantedAuthority> getAuthorities() {

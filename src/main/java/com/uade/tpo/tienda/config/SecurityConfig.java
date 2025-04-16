@@ -35,19 +35,21 @@ public class SecurityConfig {
                 // Gestión de usuarios - Solo ADMIN
                 .requestMatchers("/usuarios/**").hasAuthority(Role.ADMIN.name())
 
+                // falta endpoints compra permitir compradores 
+                // y q solo admin tegno axcceso a ordenes de compra y item consultar 
+
                 // Categorías
                 .requestMatchers("/categories/create").hasAuthority(Role.ADMIN.name())
-                .requestMatchers("/categories/**").authenticated()
+                //ver si damos acceso a comprador a acceder a una cateria en aparticular , poner comprador 
+                .requestMatchers("/categories/**").permitAll()
 
-                // Productos - VENDEDOR puede crear, actualizar, borrar
-                .requestMatchers(HttpMethod.POST, "/productos").hasAuthority(Role.VENDEDOR.name())
-                .requestMatchers(HttpMethod.PUT, "/productos/**").hasAuthority(Role.VENDEDOR.name())
-                .requestMatchers(HttpMethod.DELETE, "/productos/**").hasAuthority(Role.VENDEDOR.name())
+                // Productos - ADMIN puede crear, actualizar, borrar
+                .requestMatchers(HttpMethod.POST, "/productos").hasAuthority(Role.ADMIN.name())
+                .requestMatchers(HttpMethod.PUT, "/productos/**").hasAuthority(Role.ADMIN.name())
+                .requestMatchers(HttpMethod.DELETE, "/productos/**").hasAuthority(Role.ADMIN.name())
 
-                // Productos - COMPRADOR, VENDEDOR y ADMIN pueden consultar y filtrar
-                .requestMatchers(HttpMethod.GET, "/productos/**").hasAnyAuthority(
-                    Role.COMPRADOR.name(), Role.VENDEDOR.name(), Role.ADMIN.name()
-                )
+                // Productos - sin estar autentitco pueden consultar y filtrar productos 
+                .requestMatchers(HttpMethod.GET, "/productos/**").permitAll()
 
                 // Cualquier otra petición requiere estar autenticado
                 .anyRequest().authenticated()

@@ -20,10 +20,8 @@ import com.uade.tpo.tienda.dto.ProductResponse;
 import com.uade.tpo.tienda.entity.Categoria;
 import com.uade.tpo.tienda.entity.FotoProducto;
 import com.uade.tpo.tienda.entity.Producto;
-import com.uade.tpo.tienda.entity.Usuario;
 import com.uade.tpo.tienda.service.category.CategoryService;
 import com.uade.tpo.tienda.service.product.ProductService;
-import com.uade.tpo.tienda.service.usuario.UsuarioService;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -44,8 +42,6 @@ public class ProductController {
     @Autowired
     private CategoryService categoryService;
     
-    @Autowired
-    private UsuarioService usuarioService;
   // crear producto
   @PostMapping
     public ResponseEntity<ProductResponse> createProduct(@RequestBody ProductRequest request) {
@@ -56,12 +52,6 @@ public class ProductController {
         }
         Categoria categoria = categoryOpt.get();
         
-        // validar que el vendedor (usuario) existe
-        Optional<Usuario> vendorOpt = usuarioService.obtenerUsuarioPorId(request.getVendedorId());
-        if (!vendorOpt.isPresent()) {
-            return ResponseEntity.badRequest().build();
-        }
-        Usuario vendedor = vendorOpt.get();
         
         // transformar la lista de PhotoRequest en entidad FotoProducto
         List<FotoProducto> fotos = null;
@@ -81,7 +71,6 @@ public class ProductController {
                 .precio(request.getPrecio())
                 .stock(request.getStock())
                 .categoria(categoria)
-                .vendedor(vendedor)
                 .fotos(fotos)   
                 .build();
                 
@@ -148,7 +137,6 @@ public class ProductController {
             .precio(producto.getPrecio())
             .stock(producto.getStock())
             .categoria(producto.getCategoria().getNombre())  
-            .vendedor(producto.getVendedor().getUsername())   
             .fotos(photoResponses)
             .createdAt(producto.getCreatedAt())
             .build();
