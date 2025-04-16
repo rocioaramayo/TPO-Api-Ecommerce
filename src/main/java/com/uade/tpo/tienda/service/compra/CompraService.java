@@ -1,9 +1,11 @@
-package com.uade.tpo.tienda.service.product;
+package com.uade.tpo.tienda.service.compra;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.uade.tpo.tienda.dto.CompraItemRequest;
@@ -16,25 +18,29 @@ import com.uade.tpo.tienda.repository.CompraRepository;
 import com.uade.tpo.tienda.repository.ProductRepository;
 import com.uade.tpo.tienda.repository.UsuarioRepository;
 
+
 import jakarta.transaction.Transactional;
 
 @Service
-@RequiredArgsConstructor
 public class CompraService {
 
-    private final ProductRepository productoRepository; // No inicializar con null
-    private final CompraRepository compraRepository; // No inicializar con null
-    private final UsuarioRepository usuarioRepository; // No inicializar con null
+    @Autowired
+    private ProductRepository productoRepository; // No inicializar con null
+    @Autowired 
+    private CompraRepository compraRepository; // No inicializar con null
+    @Autowired
+    private UsuarioRepository usuarioRepository; // No inicializar con null
 
     @Transactional
     public void procesarCompra(CompraRequest request) {
         // Lista de ítems de compra (CompraItem)
         List<CompraItem> items = new ArrayList<>();
 
-        // Buscamos el usuario con el ID proporcionado
-        Usuario usuario = usuarioRepository.findById(request.getUsuarioId())
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        String email= SecurityContextHolder.getContext().getAuthentication().getName();
 
+        Usuario usuario = usuarioRepository.findByEmail(email)
+        .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        
         // Iteramos sobre cada item de la compra en la request
         for (CompraItemRequest itemReq : request.getItems()) {
             // Buscamos el producto correspondiente

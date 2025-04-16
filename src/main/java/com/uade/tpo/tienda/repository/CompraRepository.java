@@ -8,6 +8,6 @@ import com.uade.tpo.tienda.entity.Compra;
 
 @Repository
 public interface CompraRepository extends JpaRepository<Compra, Long> {
-    // Si querés agregar métodos custom más adelante, podés hacerlo acá
+    
 }
 
