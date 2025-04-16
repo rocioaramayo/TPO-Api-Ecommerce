@@ -2,6 +2,7 @@ package com.uade.tpo.tienda.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -28,25 +29,27 @@ public class SecurityConfig {
         http
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(req -> req
-                // Auth endpoints públicos
-                .requestMatchers("/api/v1/auth/**").permitAll()
-                .requestMatchers("/error/**").permitAll()
+                // Endpoints públicos
+                .requestMatchers("/api/v1/auth/**", "/error/**").permitAll()
 
-                // Usuarios - Solo ADMIN
+                // Gestión de usuarios - Solo ADMIN
                 .requestMatchers("/usuarios/**").hasAuthority(Role.ADMIN.name())
 
-                // Productos - Solo VENDEDOR puede crear, modificar y eliminar
-                .requestMatchers("/productos", "/productos/", "/productos/{id}").hasAuthority(Role.VENDEDOR.name())
-
-                // Productos - COMPRADOR y VENDEDOR pueden listar productos
-                .requestMatchers("/productos", "/productos/**").hasAnyAuthority(Role.COMPRADOR.name(), Role.VENDEDOR.name())
-
-                // Categorías - Solo ADMIN puede crear
+                // Categorías
                 .requestMatchers("/categories/create").hasAuthority(Role.ADMIN.name())
-
-                // Categorías - Todos autenticados pueden ver (si hay otros endpoints, agregar aquí)
                 .requestMatchers("/categories/**").authenticated()
 
+                // Productos - VENDEDOR puede crear, actualizar, borrar
+                .requestMatchers(HttpMethod.POST, "/productos").hasAuthority(Role.VENDEDOR.name())
+                .requestMatchers(HttpMethod.PUT, "/productos/**").hasAuthority(Role.VENDEDOR.name())
+                .requestMatchers(HttpMethod.DELETE, "/productos/**").hasAuthority(Role.VENDEDOR.name())
+
+                // Productos - COMPRADOR, VENDEDOR y ADMIN pueden consultar y filtrar
+                .requestMatchers(HttpMethod.GET, "/productos/**").hasAnyAuthority(
+                    Role.COMPRADOR.name(), Role.VENDEDOR.name(), Role.ADMIN.name()
+                )
+
+                // Cualquier otra petición requiere estar autenticado
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
