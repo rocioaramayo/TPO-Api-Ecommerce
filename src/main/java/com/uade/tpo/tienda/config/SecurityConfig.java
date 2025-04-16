@@ -29,6 +29,7 @@ public class SecurityConfig {
         http
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(req -> req
+
                 // Endpoints públicos
                 .requestMatchers("/api/v1/auth/**", "/error/**").permitAll()
 
@@ -52,6 +53,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/productos/**").permitAll()
 
                 // Cualquier otra petición requiere estar autenticado
+
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
