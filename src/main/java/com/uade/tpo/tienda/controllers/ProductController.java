@@ -155,20 +155,6 @@ public ResponseEntity<List<ProductResponse>> filtrarProductos(
     return ResponseEntity.ok(response);
 }
 
-@GetMapping("/filtrar")
-public ResponseEntity<List<ProductResponse>> filtrarProductos(
-        @RequestParam(required = false) String nombre,
-        @RequestParam(required = false) String categoria,
-        @RequestParam(required = false) Double precioMax) {
-
-    List<Producto> productosFiltrados = productService.filtrarProductos(nombre, categoria, precioMax);
-    List<ProductResponse> response = productosFiltrados.stream()
-        .map(this::mapToProductResponse)
-        .toList();
-
-    return ResponseEntity.ok(response);
-}
-
 
 
 }
