@@ -1,5 +1,6 @@
 package com.uade.tpo.tienda.service.product;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,5 +54,21 @@ public class ProductServiceImpl implements ProductService{
   public void deleteProduct(Long id) {
     productRepository.deleteById(id);
   }
+  @Override
+public Optional<Producto> getProductById(Long id) {
+    return productRepository.findById(id);
+}
+@Override
+public List<Producto> filtrarProductos(String nombre, String categoria, Double precioMax) {
+    List<Producto> productos = productRepository.findAll();
+
+    return productos.stream()
+        .filter(p -> (nombre == null || p.getNombre().toLowerCase().contains(nombre.toLowerCase())))
+        .filter(p -> (categoria == null || p.getCategoria().getNombre().equalsIgnoreCase(categoria)))
+        .filter(p -> (precioMax == null || p.getPrecio() <= precioMax))
+        .filter(p -> p.getStock() > 0) // solo si tiene  stock
+        .toList();
+}
+
   
 }
