@@ -11,4 +11,6 @@ import com.uade.tpo.tienda.entity.Producto;
 @Repository
 public interface ProductRepository extends JpaRepository <Producto, Long> {
   Page<Producto> findByStockGreaterThan(int stock, Pageable pageable);
+  boolean existsByNombreAndCategoria_Id(String nombre, Long categoriaId);
+
 }

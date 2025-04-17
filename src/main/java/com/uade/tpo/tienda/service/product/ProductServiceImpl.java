@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import com.uade.tpo.tienda.entity.Producto;
 import com.uade.tpo.tienda.exceptions.ProductoNoEncontradoException;
 import com.uade.tpo.tienda.exceptions.ProductoSinImagenesException;
+import com.uade.tpo.tienda.exceptions.ProductoYaExisteException;
 import com.uade.tpo.tienda.repository.ProductRepository;
 @Service
 public class ProductServiceImpl implements ProductService{
@@ -19,6 +20,16 @@ public class ProductServiceImpl implements ProductService{
 
   @Override
   public Producto createProduct(Producto producto) {
+    // Validar que no exista un producto igual (nombre + categoría)
+    boolean productoExiste = productRepository.existsByNombreAndCategoria_Id(
+        producto.getNombre(),
+        producto.getCategoria().getId()
+    );
+
+    if (productoExiste) {
+        throw new ProductoYaExisteException(); // creás esta excepción
+    }
+
     if (producto.getFotos() != null) {
       producto.getFotos().forEach(foto -> foto.setProducto(producto));
       return productRepository.save(producto);
