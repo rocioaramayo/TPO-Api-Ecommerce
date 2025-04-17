@@ -6,6 +6,7 @@ package com.uade.tpo.tienda.entity;
  import lombok.Data;
  import lombok.NoArgsConstructor;
  @Entity
+ @Table(name = "compra_item")
  @Data
  @NoArgsConstructor
  @AllArgsConstructor

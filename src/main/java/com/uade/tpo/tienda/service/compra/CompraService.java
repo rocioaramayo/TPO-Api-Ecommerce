@@ -14,6 +14,9 @@ import com.uade.tpo.tienda.entity.Compra;
 import com.uade.tpo.tienda.entity.CompraItem;
 import com.uade.tpo.tienda.entity.Producto;
 import com.uade.tpo.tienda.entity.Usuario;
+import com.uade.tpo.tienda.exceptions.ProductoNoEncontradoException;
+import com.uade.tpo.tienda.exceptions.StockInsuficienteException;
+import com.uade.tpo.tienda.exceptions.UsuarioNoEncontradoException;
 import com.uade.tpo.tienda.repository.CompraRepository;
 import com.uade.tpo.tienda.repository.ProductRepository;
 import com.uade.tpo.tienda.repository.UsuarioRepository;
@@ -33,45 +36,46 @@ public class CompraService {
  
     @Transactional
     public void procesarCompra(CompraRequest request) {
-        // Lista de ítems de compra (CompraItem)
-        List<CompraItem> items = new ArrayList<>();
- 
+        // Lista de ítems de compra (CompraItem) 
         String email= SecurityContextHolder.getContext().getAuthentication().getName();
  
         Usuario usuario = usuarioRepository.findByEmail(email)
-        .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        .orElseThrow(UsuarioNoEncontradoException::new);
        
-        // Iteramos sobre cada item de la compra en la request
+        Compra compra = new Compra();
+        compra.setFecha(LocalDateTime.now());
+        compra.setUsuario(usuario);
+
+        // Guardar primero la compra sin los ítems, para que tenga ID
+        compra = compraRepository.save(compra);
+
+        // Lista para guardar ítems con la compra asignada
+        List<CompraItem> items = new ArrayList<>();
+        double total = 0;
+
         for (CompraItemRequest itemReq : request.getItems()) {
-            // Buscamos el producto correspondiente
             Producto producto = productoRepository.findById(itemReq.getProductoId())
-                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
- 
-            // Comprobamos si hay suficiente stock
+                .orElseThrow(() -> new ProductoNoEncontradoException());
+
             if (producto.getStock() < itemReq.getCantidad()) {
-                throw new RuntimeException("Stock insuficiente para " + producto.getNombre());
+                throw new StockInsuficienteException();
             }
- 
-            // Reducimos el stock del producto
+
             producto.setStock(producto.getStock() - itemReq.getCantidad());
             productoRepository.save(producto);
- 
-            // Creamos un CompraItem para el ítem de la compra
+
             CompraItem item = new CompraItem();
             item.setProducto(producto);
             item.setCantidad(itemReq.getCantidad());
- 
-            // Asignamos el CompraItem a la lista de ítems
+            item.setCompra(compra); // acá ya tiene un ID válido
+            total += producto.getPrecio() * itemReq.getCantidad(); // 👉 sumamos al total
             items.add(item);
         }
- 
-        // Creamos una nueva compra
-        Compra compra = new Compra();
-        compra.setFecha(LocalDateTime.now());
+
+        // Asignar los ítems y guardar la compra actualizada
         compra.setItems(items);
-        compra.setUsuario(usuario); // Asignamos el usuario encontrado en la base de datos
- 
-        // Guardamos la compra en el repositorio
+        compra.setTotal(total);
         compraRepository.save(compra);
+
     }
 }
