@@ -51,13 +51,25 @@ public class AuthServiceImpl implements AuthService {
     }
     @Override
 public AuthenticationResponse register(RegisterRequest request) {
+    Role role= request.getRole();
+    // si rol no pone nada le pongo por defecto q es comprador
+    if(role==null){
+        role=Role.COMPRADOR;
+    }
+
+    if(role==Role.ADMIN){
+        boolean adminYaExiste = usuarioRepository.existsByRole(Role.ADMIN);
+        if( adminYaExiste){
+            throw new RuntimeException("Ya existe un usuario con rol ADMIN");
+        }
+    }
     Usuario user = Usuario.builder()
         .username(request.getUsername())
         .email(request.getEmail())
         .password(passwordEncoder.encode(request.getPassword()))
         .firstName(request.getFirstName())
         .lastName(request.getLastName())
-        .role(Role.COMPRADOR)
+        .role(role)
         .build();
 
     usuarioRepository.save(user);
