@@ -30,7 +30,7 @@ public class ProductServiceImpl implements ProductService{
         throw new ProductoYaExisteException(); // creás esta excepción
     }
 
-    if (producto.getFotos() != null) {
+    if (producto.getFotos() != null || producto.getFotos().isEmpty()) {
       producto.getFotos().forEach(foto -> foto.setProducto(producto));
       return productRepository.save(producto);
   }// agregar si no sube con fotos no dejar 

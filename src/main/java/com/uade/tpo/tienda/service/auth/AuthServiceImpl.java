@@ -35,23 +35,23 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public LoginResponse login(LoginRequest request) {
+        Usuario user = usuarioRepository.findByEmail(request.getEmail())
+            .orElseThrow(UsuarioNoEncontradoException::new);
+    
         authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(
                 request.getEmail(),
                 request.getPassword()
             )
         );
-
-        UserDetails user = usuarioRepository.findByEmail(request.getEmail())
-        .orElseThrow(UsuarioNoEncontradoException::new);
-
-
+    
         String jwt = jwtService.generateToken(user);
-
+    
         return LoginResponse.builder()
             .token(jwt)
             .build();
     }
+    
     @Override
 public AuthenticationResponse register(RegisterRequest request) {
     if (usuarioRepository.findByEmail(request.getEmail()).isPresent()) {
