@@ -7,6 +7,8 @@ import com.uade.tpo.tienda.dto.LoginResponse;
 import com.uade.tpo.tienda.dto.RegisterRequest;
 import com.uade.tpo.tienda.entity.Usuario;
 import com.uade.tpo.tienda.enums.Role;
+import com.uade.tpo.tienda.exceptions.UsuarioNoEncontradoException;
+import com.uade.tpo.tienda.exceptions.UsuarioYaExisteException;
 import com.uade.tpo.tienda.repository.UsuarioRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -41,7 +43,8 @@ public class AuthServiceImpl implements AuthService {
         );
 
         UserDetails user = usuarioRepository.findByEmail(request.getEmail())
-            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        .orElseThrow(UsuarioNoEncontradoException::new);
+
 
         String jwt = jwtService.generateToken(user);
 
@@ -51,6 +54,14 @@ public class AuthServiceImpl implements AuthService {
     }
     @Override
 public AuthenticationResponse register(RegisterRequest request) {
+    if (usuarioRepository.findByEmail(request.getEmail()).isPresent()) {
+        throw new UsuarioYaExisteException();
+    }
+
+    if (usuarioRepository.findByUsername(request.getUsername()).isPresent()) {
+        throw new UsuarioYaExisteException();
+    }
+
     Role role= request.getRole();
     // si rol no pone nada le pongo por defecto q es comprador
     if(role==null){

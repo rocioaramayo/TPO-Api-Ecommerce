@@ -83,10 +83,9 @@ public class ProductController {
     }
     @GetMapping("/detalle/{id}")
     public ResponseEntity<ProductResponse> getProductDetail(@PathVariable Long id) {
-        Optional<Producto> productoOpt = productService.getProductById(id);
-        return productoOpt.map(p -> ResponseEntity.ok(mapToProductResponse(p)))
-                          .orElse(ResponseEntity.notFound().build());
-    }
+    Producto producto = productService.getProductById(id); // si no existe, lanza excepción
+    return ResponseEntity.ok(mapToProductResponse(producto));
+}
 
   // listar productos
   @GetMapping

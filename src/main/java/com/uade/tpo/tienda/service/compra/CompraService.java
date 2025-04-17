@@ -68,7 +68,7 @@ public class CompraService {
             item.setProducto(producto);
             item.setCantidad(itemReq.getCantidad());
             item.setCompra(compra); // acá ya tiene un ID válido
-            total += producto.getPrecio() * itemReq.getCantidad(); // 👉 sumamos al total
+            total += producto.getPrecio() * itemReq.getCantidad(); // 
             items.add(item);
         }
 

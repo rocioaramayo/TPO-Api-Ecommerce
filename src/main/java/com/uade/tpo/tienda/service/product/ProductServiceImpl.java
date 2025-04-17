@@ -9,6 +9,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.uade.tpo.tienda.entity.Producto;
+import com.uade.tpo.tienda.exceptions.ProductoNoEncontradoException;
+import com.uade.tpo.tienda.exceptions.ProductoSinImagenesException;
 import com.uade.tpo.tienda.repository.ProductRepository;
 @Service
 public class ProductServiceImpl implements ProductService{
@@ -21,7 +23,7 @@ public class ProductServiceImpl implements ProductService{
       producto.getFotos().forEach(foto -> foto.setProducto(producto));
       return productRepository.save(producto);
   }// agregar si no sube con fotos no dejar 
-    throw new RuntimeException("Producto no se puede crear sin imagenes ");
+    throw new ProductoSinImagenesException();
 
   }   
 
@@ -47,15 +49,17 @@ public class ProductServiceImpl implements ProductService{
         return productRepository.save(existing);
     }
     
-    throw new RuntimeException("Producto no encontrado con id: " + id);
+    throw new ProductoNoEncontradoException();
+
 }
   @Override
   public void deleteProduct(Long id) {
     productRepository.deleteById(id);
   }
   @Override
-public Optional<Producto> getProductById(Long id) {
-    return productRepository.findById(id);
+  public Producto getProductById(Long id) {
+    return productRepository.findById(id)
+        .orElseThrow(ProductoNoEncontradoException::new);
 }
 @Override
 public List<Producto> filtrarProductos(String nombre, String categoria, Double precioMax) {

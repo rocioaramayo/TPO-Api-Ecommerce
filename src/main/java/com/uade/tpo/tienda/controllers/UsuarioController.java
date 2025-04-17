@@ -1,7 +1,6 @@
 package com.uade.tpo.tienda.controllers;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.uade.tpo.tienda.dto.UserRequest;
 import com.uade.tpo.tienda.entity.Usuario;
+import com.uade.tpo.tienda.exceptions.UsuarioNoEncontradoException;
 import com.uade.tpo.tienda.service.usuario.UsuarioService;
 
 import org.springframework.web.bind.annotation.PostMapping;
@@ -46,12 +46,14 @@ public class UsuarioController {
 
   
   @GetMapping("/{id}")
-  public ResponseEntity<Usuario> obtenerUsuarioPorId(@PathVariable Long id){
-    Optional<Usuario> usuarioOpt = usuarioService.obtenerUsuarioPorId(id);
-    return usuarioOpt.map(ResponseEntity::ok)
-    .orElse(ResponseEntity.notFound().build());
-    
-  }
+public ResponseEntity<Usuario> obtenerUsuarioPorId(@PathVariable Long id) {
+    try {
+        Usuario usuario = usuarioService.obtenerUsuarioPorId(id);
+        return ResponseEntity.ok(usuario);
+    } catch (UsuarioNoEncontradoException e) {
+        return ResponseEntity.notFound().build();
+    }
+}
 
   @GetMapping
   public ResponseEntity<List<Usuario>>listarUsuarios() {

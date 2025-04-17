@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.uade.tpo.tienda.entity.Categoria;
+import com.uade.tpo.tienda.exceptions.CategoriaDuplicadaException;
 import com.uade.tpo.tienda.repository.CategoryRepository;
 
 @Service
@@ -15,12 +16,17 @@ public class CategoryServiceImpl implements CategoryService {
     
     @Override
     public Categoria createCategory(Categoria category) {
-        return categoryRepository.save(category);
+        if (!categoryRepository.findByDescripcion(category.getDescripcion()).isEmpty()) {
+            throw new CategoriaDuplicadaException(); // lanza excepción si está duplicada
+        }
+        return categoryRepository.save(category); // guarda si está todo ok
     }
+
     @Override
     public Optional<Categoria> getCategoryById(Long id) {
         return categoryRepository.findById(id);
     }
+
     @Override
     public List<Categoria> getCategory() {
         return categoryRepository.findAll();

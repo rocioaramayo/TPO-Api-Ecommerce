@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.uade.tpo.tienda.entity.Usuario;
 import com.uade.tpo.tienda.enums.Role;
+import com.uade.tpo.tienda.exceptions.UsuarioNoEncontradoException;
 import com.uade.tpo.tienda.repository.UsuarioRepository;
 
 @Service
@@ -48,10 +49,12 @@ public class UsuarioServiceImpl implements UsuarioService{
     }
 
 
-  @Override
-    public Optional<Usuario> obtenerUsuarioPorId(Long id) {
-      return usuarioRepository.findById(id);
-  }
+    @Override
+    public Usuario obtenerUsuarioPorId(Long id) {
+        return usuarioRepository.findById(id)
+            .orElseThrow(UsuarioNoEncontradoException::new);
+    }
+    
 
   @Override
   public List<Usuario> listarUsuarios() {
