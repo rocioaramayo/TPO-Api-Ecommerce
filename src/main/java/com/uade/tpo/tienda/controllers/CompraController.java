@@ -6,7 +6,7 @@ package com.uade.tpo.tienda.controllers;
  import org.springframework.web.bind.annotation.RequestBody;
  import org.springframework.web.bind.annotation.RequestMapping;
  import org.springframework.web.bind.annotation.RestController;
- 
+ import com.uade.tpo.tienda.service.compra.*;
  import com.uade.tpo.tienda.dto.CompraRequest;
  import com.uade.tpo.tienda.service.compra.CompraService;
  
@@ -17,8 +17,7 @@ package com.uade.tpo.tienda.controllers;
  public class CompraController {
  
      @Autowired
-     private CompraService compraService = new CompraService();
- 
+     private InterfazCompraService compraService;
      @PostMapping
      public ResponseEntity<?> realizarCompra(@RequestBody CompraRequest request) {
          try {

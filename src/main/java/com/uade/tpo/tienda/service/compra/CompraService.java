@@ -25,7 +25,7 @@ import com.uade.tpo.tienda.repository.UsuarioRepository;
 import jakarta.transaction.Transactional;
  
 @Service
-public class CompraService {
+public class CompraService implements InterfazCompraService {
  
     @Autowired
     private ProductRepository productoRepository; // No inicializar con null
