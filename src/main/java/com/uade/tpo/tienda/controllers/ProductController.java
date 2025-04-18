@@ -57,7 +57,7 @@ public class ProductController {
         
         // transformar la lista de PhotoRequest en entidad FotoProducto
         List<FotoProducto> fotos = null;
-        if (request.getFotos() != null || !request.getFotos().isEmpty()) {
+        if (request.getFotos() != null && !request.getFotos().isEmpty()) {
             fotos = request.getFotos().stream().map(photoReq ->
                 FotoProducto.builder()
                     .url(photoReq.getUrl())
