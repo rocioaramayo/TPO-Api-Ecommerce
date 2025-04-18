@@ -8,7 +8,6 @@ package com.uade.tpo.tienda.controllers;
  import org.springframework.web.bind.annotation.RestController;
  import com.uade.tpo.tienda.service.compra.*;
  import com.uade.tpo.tienda.dto.CompraRequest;
- import com.uade.tpo.tienda.service.compra.CompraService;
  
  
  @RestController

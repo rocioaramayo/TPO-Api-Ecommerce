@@ -7,7 +7,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.uade.tpo.tienda.entity.Usuario;
-import com.uade.tpo.tienda.enums.Role;
 import com.uade.tpo.tienda.exceptions.UsuarioNoEncontradoException;
 import com.uade.tpo.tienda.repository.UsuarioRepository;
 
@@ -18,36 +17,6 @@ public class UsuarioServiceImpl implements UsuarioService{
   private UsuarioRepository usuarioRepository;
   @Autowired
   private PasswordEncoder passwordEncoder;
-
-  @Override
-  public Usuario crearUsuario(Usuario usuario) {
-    // Validar que el nombre de usuario no esté en uso
-    if (usuarioRepository.findByUsername(usuario.getUsername()).isPresent()) {
-      throw new IllegalArgumentException("El nombre de usuario ya está en uso");
-  }
-  
-    // Validar que el email no esté en uso
-    if (usuarioRepository.findByEmail(usuario.getEmail()).isPresent()) {
-        throw new IllegalArgumentException("El email ya está en uso");
-    }
-    
-    // Validar que la contraseña cumpla ciertos criterios (por ejemplo, mínimo 8 caracteres)
-    if (usuario.getPassword() == null || usuario.getPassword().length() < 8) {
-        throw new IllegalArgumentException("La contraseña debe tener al menos 8 caracteres");
-    }
-    
-    usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
-
-    
-    // Si no se especifica un rol, se puede asignar uno por defecto (ejemplo: COMPRADOR)
-    if (usuario.getRole() == null) {
-        usuario.setRole(Role.COMPRADOR);
-    }
-    
-    // Guardar el usuario en la base de datos y devolver el usuario creado
-    return usuarioRepository.save(usuario);
-    }
-
 
     @Override
     public Usuario obtenerUsuarioPorId(Long id) {

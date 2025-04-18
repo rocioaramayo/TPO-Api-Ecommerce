@@ -16,7 +16,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -61,7 +60,10 @@ public AuthenticationResponse register(RegisterRequest request) {
     if (usuarioRepository.findByUsername(request.getUsername()).isPresent()) {
         throw new UsuarioYaExisteException();
     }
-
+    // Validar longitud mínima de contraseña
+    if (request.getPassword() == null || request.getPassword().length() < 8) {
+        throw new IllegalArgumentException("La contraseña debe tener al menos 8 caracteres");
+    }
     Role role= request.getRole();
     // si rol no pone nada le pongo por defecto q es comprador
     if(role==null){
