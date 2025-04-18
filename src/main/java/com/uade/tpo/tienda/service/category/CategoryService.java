@@ -6,6 +6,6 @@ import com.uade.tpo.tienda.entity.Categoria;
 
 public interface CategoryService {
     Optional<Categoria> getCategoryById(Long id);
-    public Categoria createCategory(Categoria category) ;
+    public Categoria createCategory(Categoria category);
     List<Categoria> getCategory();
 }
