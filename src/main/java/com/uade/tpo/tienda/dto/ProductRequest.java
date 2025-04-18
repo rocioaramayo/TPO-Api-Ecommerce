@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.util.List;
 
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -16,5 +17,5 @@ public class ProductRequest {
     private Double precio;
     private Integer stock;
     private Long categoryId;  // ID de la categoría a la que pertenece el producto
-    private List<PhotoRequest> fotos; // Lista de fotos a asociar al productos
+    private List<PhotoRequest> fotos;// Lista de fotos a asociar al productos
 }

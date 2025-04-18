@@ -21,6 +21,7 @@ import com.uade.tpo.tienda.dto.StockRequest;
 import com.uade.tpo.tienda.entity.Categoria;
 import com.uade.tpo.tienda.entity.FotoProducto;
 import com.uade.tpo.tienda.entity.Producto;
+import com.uade.tpo.tienda.exceptions.ProductoSinImagenesException;
 import com.uade.tpo.tienda.service.category.CategoryService;
 import com.uade.tpo.tienda.service.product.ProductService;
 
@@ -56,13 +57,15 @@ public class ProductController {
         
         // transformar la lista de PhotoRequest en entidad FotoProducto
         List<FotoProducto> fotos = null;
-        if (request.getFotos() != null) {
+        if (request.getFotos() != null || !request.getFotos().isEmpty()) {
             fotos = request.getFotos().stream().map(photoReq ->
                 FotoProducto.builder()
                     .url(photoReq.getUrl())
                     .descripcion(photoReq.getDescripcion())
                     .build()
             ).collect(Collectors.toList());
+        }else{
+            throw new ProductoSinImagenesException();
         }
         
         // construir Producto 
