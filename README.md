@@ -23,7 +23,6 @@ La aplicación ofrece funcionalidades para:
 - Gestión de productos (publicación, edición, eliminación)
 - Visualización, búsqueda y filtrado de productos
 - Gestión de stock
-- Carrito de compras con proceso de checkout (sin pago real)
 
 ---
 
@@ -31,7 +30,7 @@ La aplicación ofrece funcionalidades para:
 
 ### 🧑‍💻 Gestión de Usuarios
 
-- Registro como **comprador** o **vendedor** (nombre de usuario, mail, contraseña, nombre y apellido)
+- Registro como **comprador** o **admin** (nombre de usuario, mail, contraseña, nombre y apellido)
 - Inicio de sesión (login)
 - Administración de permisos
 
@@ -40,16 +39,10 @@ La aplicación ofrece funcionalidades para:
 - Visualización de productos con fotos y precios
 - Filtros por categoría, precio, etc.
 - Detalle del producto con imagen y descripción
-- Agregado de productos al carrito
 - Productos sin stock: se muestran como agotados y no se pueden agregar
 
-### 🛒 Carrito de Compras
 
-- Agregar, eliminar y modificar productos en el carrito
-- Checkout del carrito con cálculo automático del total
-- Descuento de stock al finalizar compra (con validación)
-
-### 🛠️ Gestión de Productos (para Vendedores)
+### 🛠️ Gestión de Productos (para Admins)
 
 - Publicación de productos con fotos, descripción, categoría y precio
 - Control de stock por parte del vendedor
