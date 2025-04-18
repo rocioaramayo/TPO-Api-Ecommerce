@@ -27,36 +27,43 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+            // Desactiva CSRF porque usamos JWT (stateless)
             .csrf(AbstractHttpConfigurer::disable)
+
             .authorizeHttpRequests(req -> req
 
-                // Endpoints públicos
+                // endpoints públicos: autenticación y errores
                 .requestMatchers("/api/v1/auth/**", "/error/**").permitAll()
 
-                // Gestión de usuarios - Solo ADMIN
+                // gestión de usuarios: solo ADMIN puede acceder
                 .requestMatchers("/usuarios/**").hasAuthority(Role.ADMIN.name())
 
-                // falta endpoints compra permitir compradores 
-                // y q solo admin tegno axcceso a ordenes de compra y item consultar 
+                // compras
+                // COMPRADOR ve sus propias compras
+                .requestMatchers(HttpMethod.GET, "/compras/mias").hasAuthority(Role.COMPRADOR.name())
+                // ADMIN ve todas las compras
+                .requestMatchers(HttpMethod.GET, "/compras").hasAuthority(Role.ADMIN.name())
 
-                // Categorías
+                // categorías
+                // Solo ADMIN puede crear
                 .requestMatchers("/categories/create").hasAuthority(Role.ADMIN.name())
-                //ver si damos acceso a comprador a acceder a una cateria en aparticular , poner comprador 
+                // Todos pueden ver categorías
                 .requestMatchers("/categories/**").permitAll()
 
-                // Productos - ADMIN puede crear, actualizar, borrar
+                // productos
+                // ADMIN puede crear, modificar y eliminar
                 .requestMatchers(HttpMethod.POST, "/productos").hasAuthority(Role.ADMIN.name())
                 .requestMatchers(HttpMethod.PUT, "/productos/**").hasAuthority(Role.ADMIN.name())
                 .requestMatchers(HttpMethod.DELETE, "/productos/**").hasAuthority(Role.ADMIN.name())
-
-                // Productos - sin estar autentitco pueden consultar y filtrar productos 
+                // Cualquier persona puede ver productos y filtrarlos
                 .requestMatchers(HttpMethod.GET, "/productos/**").permitAll()
 
-                // Cualquier otra petición requiere estar autenticado
-
+                // 🔐 Todo lo que no esté especificado, requiere estar autenticado
                 .anyRequest().authenticated()
             )
+
             .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
+
             .authenticationProvider(authenticationProvider)
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 

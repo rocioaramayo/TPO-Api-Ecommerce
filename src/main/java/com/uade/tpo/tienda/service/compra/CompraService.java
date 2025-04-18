@@ -78,4 +78,13 @@ public class CompraService implements InterfazCompraService {
         compraRepository.save(compra);
 
     }
+    public List<Compra> obtenerComprasDeUsuario(String email) {
+        Usuario usuario = usuarioRepository.findByEmail(email)
+            .orElseThrow(UsuarioNoEncontradoException::new);
+    
+        return compraRepository.findByUsuario(usuario);
+    }
+    public List<Compra> obtenerTodas() {
+        return compraRepository.findAll();
+    }
 }
