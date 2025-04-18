@@ -29,11 +29,11 @@ public class FotoProducto {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Muchos fotos pertenecen a un producto
-    @ManyToOne 
+    @ManyToOne
     @JoinColumn(name = "producto_id", nullable = false)
     private Producto producto;
 
+    
     @Column(nullable = false)
     private String url;
 
@@ -42,4 +42,5 @@ public class FotoProducto {
     @CreationTimestamp
     @Column(name = "created_at")
     private LocalDateTime createdAt;
+    
 }
