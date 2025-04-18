@@ -6,7 +6,7 @@ import com.uade.tpo.tienda.dto.CompraRequest;
 import com.uade.tpo.tienda.entity.Compra;
 
 public interface InterfazCompraService {
-    void procesarCompra(CompraRequest request);
-List<Compra> obtenerComprasDeUsuario(String email);
-List<Compra> obtenerTodas() ;
+    Compra procesarCompra(CompraRequest request);
+    List<Compra> obtenerComprasDeUsuario(String email);
+    List<Compra> obtenerTodas() ;
 }

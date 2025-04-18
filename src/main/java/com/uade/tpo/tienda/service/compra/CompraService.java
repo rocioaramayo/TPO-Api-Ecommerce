@@ -28,55 +28,56 @@ import jakarta.transaction.Transactional;
 public class CompraService implements InterfazCompraService {
  
     @Autowired
-    private ProductRepository productoRepository; // No inicializar con null
+    private ProductRepository productoRepository; 
     @Autowired
-    private CompraRepository compraRepository; // No inicializar con null
+    private CompraRepository compraRepository; 
     @Autowired
-    private UsuarioRepository usuarioRepository; // No inicializar con null
+    private UsuarioRepository usuarioRepository; 
  
     @Transactional
-    public void procesarCompra(CompraRequest request) {
-        // Lista de ítems de compra (CompraItem) 
-        String email= SecurityContextHolder.getContext().getAuthentication().getName();
- 
+    public Compra procesarCompra(CompraRequest request) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+    
         Usuario usuario = usuarioRepository.findByEmail(email)
-        .orElseThrow(UsuarioNoEncontradoException::new);
-       
+            .orElseThrow(UsuarioNoEncontradoException::new);
+        
         Compra compra = new Compra();
         compra.setFecha(LocalDateTime.now());
         compra.setUsuario(usuario);
-
-        // Guardar primero la compra sin los ítems, para que tenga ID
+    
+        // Guardar compra vacía para obtener ID
         compra = compraRepository.save(compra);
-
-        // Lista para guardar ítems con la compra asignada
+    
         List<CompraItem> items = new ArrayList<>();
         double total = 0;
-
+    
         for (CompraItemRequest itemReq : request.getItems()) {
             Producto producto = productoRepository.findById(itemReq.getProductoId())
-                .orElseThrow(() -> new ProductoNoEncontradoException());
-
+                .orElseThrow(ProductoNoEncontradoException::new);
+    
             if (producto.getStock() < itemReq.getCantidad()) {
                 throw new StockInsuficienteException();
             }
-
+    
             producto.setStock(producto.getStock() - itemReq.getCantidad());
             productoRepository.save(producto);
-
+    
             CompraItem item = new CompraItem();
             item.setProducto(producto);
             item.setCantidad(itemReq.getCantidad());
-            item.setCompra(compra); // acá ya tiene un ID válido
-            total += producto.getPrecio() * itemReq.getCantidad(); // 
+            item.setCompra(compra);
+    
+            total += producto.getPrecio() * itemReq.getCantidad();
             items.add(item);
         }
-
-        // Asignar los ítems y guardar la compra actualizada
+    
         compra.setItems(items);
         compra.setTotal(total);
+    
+        // Guardar compra final con ítems y total
         compraRepository.save(compra);
-
+    
+        return compra;
     }
     public List<Compra> obtenerComprasDeUsuario(String email) {
         Usuario usuario = usuarioRepository.findByEmail(email)

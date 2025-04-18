@@ -23,13 +23,18 @@ import com.uade.tpo.tienda.entity.Compra;
  
     @Autowired
      private InterfazCompraService compraService;
-    @PostMapping
-     public ResponseEntity<?> realizarCompra(@RequestBody CompraRequest request) {
+     @PostMapping
+     public ResponseEntity<CompraResponse> realizarCompra(@RequestBody CompraRequest request) {
          try {
-             compraService.procesarCompra(request);
-             return ResponseEntity.ok("Compra realizada con éxito");
+             // Procesa y guarda la compra, ahora el método devuelve una Compra
+             Compra compra = compraService.procesarCompra(request);
+     
+             // Mapea la entidad a un DTO limpio para la respuesta
+             CompraResponse response = mapearACompraResponse(compra);
+     
+             return ResponseEntity.ok(response);
          } catch (RuntimeException e) {
-             return ResponseEntity.badRequest().body(e.getMessage());
+             return ResponseEntity.badRequest().body(null);
          }
      }
     @GetMapping("/mias")
@@ -85,4 +90,21 @@ public ResponseEntity<List<CompraResponse>> obtenerTodasLasCompras() {
 
     return ResponseEntity.ok(response);
 }
+
+private CompraResponse mapearACompraResponse(Compra compra) {
+    return new CompraResponse(
+        compra.getId(),
+        compra.getFecha(),
+        compra.getItems().stream()
+        .map(item -> new CompraItemResponse(
+            item.getProducto().getNombre(),
+            item.getCantidad(),
+            item.getProducto().getPrecio(), // <- nuevo parámetro: precio unitario
+            item.getCantidad() * item.getProducto().getPrecio() // subtotal calculado
+        ))
+            .toList(),
+        compra.getTotal()
+    );
+}
+
  }
