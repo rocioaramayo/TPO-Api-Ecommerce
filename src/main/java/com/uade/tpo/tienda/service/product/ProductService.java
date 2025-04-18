@@ -12,6 +12,7 @@ public interface ProductService {
   Producto createProduct(Producto product);
   Page<Producto> getProducts(Pageable pageable);
   Producto updateProduct(Long id, Producto productoUpdated);
+  Producto updateStockProduct(Long id, Integer newStock);
   void deleteProduct(Long id);
   Producto getProductById(Long id);
   List<Producto> filtrarProductos(String nombre, String categoria, Double precioMax);

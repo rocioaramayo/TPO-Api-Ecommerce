@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.uade.tpo.tienda.entity.Producto;
+import com.uade.tpo.tienda.exceptions.FaltanDatosException;
 import com.uade.tpo.tienda.exceptions.ProductoNoEncontradoException;
 import com.uade.tpo.tienda.exceptions.ProductoSinImagenesException;
 import com.uade.tpo.tienda.exceptions.ProductoYaExisteException;
@@ -30,7 +31,7 @@ public class ProductServiceImpl implements ProductService{
         throw new ProductoYaExisteException(); // creás esta excepción
     }
 
-    if (producto.getFotos() != null || producto.getFotos().isEmpty()) {
+    if (producto.getFotos() != null || !producto.getFotos().isEmpty()) {
       producto.getFotos().forEach(foto -> foto.setProducto(producto));
       return productRepository.save(producto);
   }// agregar si no sube con fotos no dejar 
@@ -46,22 +47,31 @@ public class ProductServiceImpl implements ProductService{
   @Override
   public Producto updateProduct(Long id, Producto productoUpdated) {
     Optional<Producto> optionalProducto = productRepository.findById(id);
-    if(optionalProducto.isPresent()){
-        Producto existing = optionalProducto.get();
-        // actualizamos los campos 
-        existing.setNombre(productoUpdated.getNombre());
-        existing.setDescripcion(productoUpdated.getDescripcion());
-        existing.setPrecio(productoUpdated.getPrecio());
-        existing.setStock(productoUpdated.getStock());
-        existing.setCategoria(productoUpdated.getCategoria());
-        // se puedes actualizar la lista 
-        existing.setFotos(productoUpdated.getFotos());
-        
-        return productRepository.save(existing);
+    if (optionalProducto.isEmpty()) {
+      throw new ProductoNoEncontradoException();
     }
-    
-    throw new ProductoNoEncontradoException();
 
+  // aca voy a validar si tengo todos los datos que necesito para actualizar
+    if (productoUpdated.getNombre() == null || 
+      productoUpdated.getDescripcion() == null ||
+      productoUpdated.getPrecio() == null ||
+      productoUpdated.getStock() == null ||
+      productoUpdated.getCategoria() == null ||
+      productoUpdated.getFotos() == null || productoUpdated.getFotos().isEmpty()) throw new FaltanDatosException();
+
+    Producto existing = optionalProducto.get();
+
+    existing.setNombre(productoUpdated.getNombre());
+    existing.setDescripcion(productoUpdated.getDescripcion());
+    existing.setPrecio(productoUpdated.getPrecio());
+    existing.setStock(productoUpdated.getStock());
+    existing.setCategoria(productoUpdated.getCategoria());
+    existing.getFotos().clear();
+    existing.getFotos().addAll(productoUpdated.getFotos());
+    existing.getFotos().forEach(foto -> {
+      foto.setProducto(existing);
+    });
+    return productRepository.save(existing);
 }
   @Override
   public void deleteProduct(Long id) {
@@ -82,6 +92,25 @@ public List<Producto> filtrarProductos(String nombre, String categoria, Double p
         .filter(p -> (precioMax == null || p.getPrecio() <= precioMax))
         .filter(p -> p.getStock() > 0) // solo si tiene  stock
         .toList();
+}
+
+@Override
+public Producto updateStockProduct(Long id, Integer newStock) {
+  //Encuentro el produto por ID
+  Optional<Producto> optionalProduct = productRepository.findById(id);
+  if (optionalProduct.isPresent()) {
+    // lo saco de optional y lo guardo en existing
+    Producto existing = optionalProduct.get();
+    
+    // y le sumo el nuevo stock que voy a tener al producto.
+    existing.setStock(existing.getStock() + newStock);
+    
+    //lo guardo y lo devuelvo
+    return productRepository.save(existing);
+
+  }else{
+    throw new ProductoNoEncontradoException();
+  }
 }
 
 

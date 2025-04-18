@@ -15,10 +15,9 @@ public class ProductResponse {
     private Long id;
     private String nombre;
     private String descripcion;
-    private double precio;
-    private int stock;
+    private Double precio;
+    private Integer stock;
     private String categoria;    // Por ejemplo, el nombre o descripción de la categoría
-    private String vendedor;     // Aquí puedes poner el username o el nombre completo del vendedor
     private List<PhotoResponse> fotos;
     private LocalDateTime createdAt;
 }

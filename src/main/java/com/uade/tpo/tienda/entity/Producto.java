@@ -40,7 +40,7 @@ public class Producto {
     private String descripcion;
 
     @Column(nullable = false)
-    private double precio;
+    private Double precio;
 
     @Column(nullable = false)
     private Integer stock;

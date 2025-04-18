@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.uade.tpo.tienda.dto.PhotoResponse;
 import com.uade.tpo.tienda.dto.ProductRequest;
 import com.uade.tpo.tienda.dto.ProductResponse;
+import com.uade.tpo.tienda.dto.StockRequest;
 import com.uade.tpo.tienda.entity.Categoria;
 import com.uade.tpo.tienda.entity.FotoProducto;
 import com.uade.tpo.tienda.entity.Producto;
@@ -37,13 +38,13 @@ import org.springframework.web.bind.annotation.PutMapping;
 @RestController
 @RequestMapping("productos")
 public class ProductController {
-  @Autowired 
-  private ProductService productService;
+    @Autowired 
+    private ProductService productService;
     @Autowired
     private CategoryService categoryService;
     
-  // crear producto
-  @PostMapping
+    // crear producto
+    @PostMapping
     public ResponseEntity<ProductResponse> createProduct(@RequestBody ProductRequest request) {
         //validar que la categoría existe
         Optional<Categoria> categoryOpt = categoryService.getCategoryById(request.getCategoryId());
@@ -81,40 +82,47 @@ public class ProductController {
         return ResponseEntity.created(URI.create("/productos/" + created.getId())).body(response);
         
     }
+
     @GetMapping("/detalle/{id}")
     public ResponseEntity<ProductResponse> getProductDetail(@PathVariable Long id) {
-    Producto producto = productService.getProductById(id); // si no existe, lanza excepción
-    return ResponseEntity.ok(mapToProductResponse(producto));
-}
+        Producto producto = productService.getProductById(id); // si no existe, lanza excepción
+        return ResponseEntity.ok(mapToProductResponse(producto));
+    }
 
-  // listar productos
-  @GetMapping
-  public ResponseEntity<Page<ProductResponse>> getProducts(
-          @RequestParam(required = false) Integer page,
-          @RequestParam(required = false) Integer size) {
-      Page<Producto> productos;
-      if (page == null || size == null) {
-          productos = productService.getProducts(PageRequest.of(0, Integer.MAX_VALUE));
-      } else {
-          productos = productService.getProducts(PageRequest.of(page, size));
-      }
+    // listar productos
+    @GetMapping
+    public ResponseEntity<Page<ProductResponse>> getProducts(
+        @RequestParam(required = false) Integer page,
+        @RequestParam(required = false) Integer size) {
+        Page<Producto> productos;
+        if (page == null || size == null) {
+            productos = productService.getProducts(PageRequest.of(0, Integer.MAX_VALUE));
+        } else {
+            productos = productService.getProducts(PageRequest.of(page, size));
+        }
       
-      // mapeo Producto a ProductResponse
-      Page<ProductResponse> responsePage = productos.map(this::mapToProductResponse);
-      return ResponseEntity.ok(responsePage);
-  }
-  @DeleteMapping("/{id}")
-  public ResponseEntity<Void> deleteProduct(@PathVariable Long id){
-    productService.deleteProduct(id);
-    return ResponseEntity.noContent().build();
+        // mapeo Producto a ProductResponse
+        Page<ProductResponse> responsePage = productos.map(this::mapToProductResponse);
+        return ResponseEntity.ok(responsePage);
+    }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteProduct(@PathVariable Long id){
+        productService.deleteProduct(id);
+        return ResponseEntity.noContent().build();
 
-  }
+    }
 
-  @PutMapping("/{id}")
-  public ResponseEntity<Producto> updateProduct(@PathVariable Long id, @RequestBody Producto producto) {
-    Producto updated= productService.updateProduct(id,producto);
-    return ResponseEntity.ok(updated);
-  }
+    @PutMapping("/{id}")
+    public ResponseEntity<Producto> updateProduct(@PathVariable Long id, @RequestBody Producto producto) {
+        Producto updated= productService.updateProduct(id,producto);
+        return ResponseEntity.ok(updated);
+    }
+
+    @PutMapping("stock/{id}")
+    public ResponseEntity<Producto> updateStockProduct (@PathVariable Long id, @RequestBody StockRequest stockRequest) {
+        Producto updated = productService.updateStockProduct(id, stockRequest.getStock());
+        return ResponseEntity.ok(updated);
+    }
 
   private ProductResponse mapToProductResponse(Producto producto) {
     // Mapear las fotos

@@ -13,8 +13,8 @@ import java.util.List;
 public class ProductRequest {
     private String nombre;
     private String descripcion;
-    private double precio;
-    private int stock;
+    private Double precio;
+    private Integer stock;
     private Long categoryId;  // ID de la categoría a la que pertenece el producto
     private List<PhotoRequest> fotos; // Lista de fotos a asociar al productos
 }
