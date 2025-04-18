@@ -9,6 +9,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.uade.tpo.tienda.entity.Producto;
+import com.uade.tpo.tienda.exceptions.FaltanDatosException;
+import com.uade.tpo.tienda.exceptions.ProductoNoEncontradoException;
+import com.uade.tpo.tienda.exceptions.ProductoSinImagenesException;
+import com.uade.tpo.tienda.exceptions.ProductoYaExisteException;
 import com.uade.tpo.tienda.repository.ProductRepository;
 @Service
 public class ProductServiceImpl implements ProductService{
@@ -17,11 +21,21 @@ public class ProductServiceImpl implements ProductService{
 
   @Override
   public Producto createProduct(Producto producto) {
-    if (producto.getFotos() != null) {
+    // Validar que no exista un producto igual (nombre + categoría)
+    boolean productoExiste = productRepository.existsByNombreAndCategoria_Id(
+        producto.getNombre(),
+        producto.getCategoria().getId()
+    );
+
+    if (productoExiste) {
+        throw new ProductoYaExisteException(); // creás esta excepción
+    }
+
+    if (producto.getFotos() != null || !producto.getFotos().isEmpty()) {
       producto.getFotos().forEach(foto -> foto.setProducto(producto));
       return productRepository.save(producto);
   }// agregar si no sube con fotos no dejar 
-    throw new RuntimeException("Producto no se puede crear sin imagenes ");
+    throw new ProductoSinImagenesException();
 
   }   
 
@@ -33,29 +47,40 @@ public class ProductServiceImpl implements ProductService{
   @Override
   public Producto updateProduct(Long id, Producto productoUpdated) {
     Optional<Producto> optionalProducto = productRepository.findById(id);
-    if(optionalProducto.isPresent()){
-        Producto existing = optionalProducto.get();
-        // actualizamos los campos 
-        existing.setNombre(productoUpdated.getNombre());
-        existing.setDescripcion(productoUpdated.getDescripcion());
-        existing.setPrecio(productoUpdated.getPrecio());
-        existing.setStock(productoUpdated.getStock());
-        existing.setCategoria(productoUpdated.getCategoria());
-        // se puedes actualizar la lista 
-        existing.setFotos(productoUpdated.getFotos());
-        
-        return productRepository.save(existing);
+    if (optionalProducto.isEmpty()) {
+      throw new ProductoNoEncontradoException();
     }
-    
-    throw new RuntimeException("Producto no encontrado con id: " + id);
+
+  // aca voy a validar si tengo todos los datos que necesito para actualizar
+    if (productoUpdated.getNombre() == null || 
+      productoUpdated.getDescripcion() == null ||
+      productoUpdated.getPrecio() == null ||
+      productoUpdated.getStock() == null ||
+      productoUpdated.getCategoria() == null ||
+      productoUpdated.getFotos() == null || productoUpdated.getFotos().isEmpty()) throw new FaltanDatosException();
+
+    Producto existing = optionalProducto.get();
+
+    existing.setNombre(productoUpdated.getNombre());
+    existing.setDescripcion(productoUpdated.getDescripcion());
+    existing.setPrecio(productoUpdated.getPrecio());
+    existing.setStock(productoUpdated.getStock());
+    existing.setCategoria(productoUpdated.getCategoria());
+    existing.getFotos().clear();
+    existing.getFotos().addAll(productoUpdated.getFotos());
+    existing.getFotos().forEach(foto -> {
+      foto.setProducto(existing);
+    });
+    return productRepository.save(existing);
 }
   @Override
   public void deleteProduct(Long id) {
     productRepository.deleteById(id);
   }
   @Override
-public Optional<Producto> getProductById(Long id) {
-    return productRepository.findById(id);
+  public Producto getProductById(Long id) {
+    return productRepository.findById(id)
+        .orElseThrow(ProductoNoEncontradoException::new);
 }
 @Override
 public List<Producto> filtrarProductos(String nombre, String categoria, Double precioMax) {
@@ -69,22 +94,24 @@ public List<Producto> filtrarProductos(String nombre, String categoria, Double p
         .toList();
 }
 
-  
-  @Override
-public Optional<Producto> getProductById(Long id) {
-    return productRepository.findById(id);
-}
-
 @Override
-public List<Producto> filtrarProductos(String nombre, String categoria, Double precioMax) {
-    List<Producto> productos = productRepository.findAll();
+public Producto updateStockProduct(Long id, Integer newStock) {
+  //Encuentro el produto por ID
+  Optional<Producto> optionalProduct = productRepository.findById(id);
+  if (optionalProduct.isPresent()) {
+    // lo saco de optional y lo guardo en existing
+    Producto existing = optionalProduct.get();
+    
+    // y le sumo el nuevo stock que voy a tener al producto.
+    existing.setStock(existing.getStock() + newStock);
+    
+    //lo guardo y lo devuelvo
+    return productRepository.save(existing);
 
-    return productos.stream()
-        .filter(p -> (nombre == null || p.getNombre().toLowerCase().contains(nombre.toLowerCase())))
-        .filter(p -> (categoria == null || p.getCategoria().getNombre().equalsIgnoreCase(categoria)))
-        .filter(p -> (precioMax == null || p.getPrecio() <= precioMax))
-        .filter(p -> p.getStock() > 0) // solo si tiene stock
-        .toList();
+  }else{
+    throw new ProductoNoEncontradoException();
+  }
 }
+
 
 }
