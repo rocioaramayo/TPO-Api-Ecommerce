@@ -7,6 +7,8 @@ import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -48,6 +50,7 @@ public class Producto {
 
     //un producto tiene muchas fotografias
     @OneToMany(mappedBy = "producto",cascade= CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<FotoProducto> fotos;
 
     //Muchos porductos pretenecen a  una categoria
