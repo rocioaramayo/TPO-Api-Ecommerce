@@ -16,6 +16,7 @@ import com.uade.tpo.tienda.entity.Producto;
 import com.uade.tpo.tienda.entity.Usuario;
 import com.uade.tpo.tienda.exceptions.ProductoNoEncontradoException;
 import com.uade.tpo.tienda.exceptions.StockInsuficienteException;
+import com.uade.tpo.tienda.exceptions.UsuarioInactivoException;
 import com.uade.tpo.tienda.exceptions.UsuarioNoEncontradoException;
 import com.uade.tpo.tienda.repository.CompraRepository;
 import com.uade.tpo.tienda.repository.ProductRepository;
@@ -39,8 +40,11 @@ public class CompraService implements InterfazCompraService {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
     
         Usuario usuario = usuarioRepository.findByEmail(email)
-            .orElseThrow(UsuarioNoEncontradoException::new);
-        
+        .orElseThrow(UsuarioNoEncontradoException::new);
+
+        if (!usuario.isActivo()) {
+            throw new UsuarioInactivoException(); // <-- esta debería lanzarse si el usuario está inactivo
+        }
         Compra compra = new Compra();
         compra.setFecha(LocalDateTime.now());
         compra.setUsuario(usuario);

@@ -14,7 +14,6 @@ import com.uade.tpo.tienda.repository.UsuarioRepository;
 
 import lombok.RequiredArgsConstructor;
 
-import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -41,7 +40,7 @@ public class AuthServiceImpl implements AuthService {
             .orElseThrow(UsuarioNoEncontradoException::new);
     
         if (!user.isActivo()) {
-             throw new UsuarioInactivoException();
+            throw new UsuarioInactivoException();
          }
     
         authenticationManager.authenticate(
@@ -69,7 +68,7 @@ public AuthenticationResponse register(RegisterRequest request) {
     if (usuarioRepository.findByUsername(request.getUsername()).isPresent()) {
         throw new UsuarioYaExisteException();
     }
-    // Validar longitud mínima de contraseña
+    // validar longitud mínima de contraseña
     if (request.getPassword() == null || request.getPassword().length() < 8) {
         throw new IllegalArgumentException("La contraseña debe tener al menos 8 caracteres");
     }

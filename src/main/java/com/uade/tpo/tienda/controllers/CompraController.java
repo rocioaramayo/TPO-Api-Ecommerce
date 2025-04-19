@@ -22,22 +22,15 @@ import com.uade.tpo.tienda.entity.Compra;
  public class CompraController {
  
     @Autowired
-     private InterfazCompraService compraService;
-     @PostMapping
-     public ResponseEntity<CompraResponse> realizarCompra(@RequestBody CompraRequest request) {
-         try {
-             // Procesa y guarda la compra, ahora el método devuelve una Compra
-             Compra compra = compraService.procesarCompra(request);
-     
-             // Mapea la entidad a un DTO limpio para la respuesta
-             CompraResponse response = mapearACompraResponse(compra);
-     
-             return ResponseEntity.ok(response);
-         } catch (RuntimeException e) {
-             return ResponseEntity.badRequest().body(null);
-         }
-     }
-    @GetMapping("/mias")
+    private InterfazCompraService compraService;
+    
+ @PostMapping
+    public ResponseEntity<CompraResponse> realizarCompra(@RequestBody CompraRequest request) {
+        Compra compra = compraService.procesarCompra(request);
+        CompraResponse response = mapearACompraResponse(compra);
+        return ResponseEntity.ok(response);
+    }
+@GetMapping("/mias")
 public ResponseEntity<List<CompraResponse>> obtenerMisCompras(Authentication authentication) {
     String email = authentication.getName();
     List<Compra> compras = compraService.obtenerComprasDeUsuario(email);
