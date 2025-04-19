@@ -41,8 +41,8 @@ public class AuthServiceImpl implements AuthService {
             .orElseThrow(UsuarioNoEncontradoException::new);
     
         if (!user.isActivo()) {
-            throw new UsuarioInactivoException();
-        }
+             throw new UsuarioInactivoException();
+         }
     
         authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(
