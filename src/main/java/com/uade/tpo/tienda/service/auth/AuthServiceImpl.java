@@ -7,11 +7,14 @@ import com.uade.tpo.tienda.dto.LoginResponse;
 import com.uade.tpo.tienda.dto.RegisterRequest;
 import com.uade.tpo.tienda.entity.Usuario;
 import com.uade.tpo.tienda.enums.Role;
+import com.uade.tpo.tienda.exceptions.UsuarioInactivoException;
 import com.uade.tpo.tienda.exceptions.UsuarioNoEncontradoException;
 import com.uade.tpo.tienda.exceptions.UsuarioYaExisteException;
 import com.uade.tpo.tienda.repository.UsuarioRepository;
 
 import lombok.RequiredArgsConstructor;
+
+import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -37,6 +40,10 @@ public class AuthServiceImpl implements AuthService {
         Usuario user = usuarioRepository.findByEmail(request.getEmail())
             .orElseThrow(UsuarioNoEncontradoException::new);
     
+        if (!user.isActivo()) {
+            throw new UsuarioInactivoException();
+        }
+    
         authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(
                 request.getEmail(),
@@ -50,6 +57,8 @@ public class AuthServiceImpl implements AuthService {
             .token(jwt)
             .build();
     }
+    
+
     
     @Override
 public AuthenticationResponse register(RegisterRequest request) {
