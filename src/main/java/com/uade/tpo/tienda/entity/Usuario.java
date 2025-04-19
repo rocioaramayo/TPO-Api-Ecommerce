@@ -51,6 +51,8 @@ public class Usuario implements UserDetails {
   @Column(nullable = false)
   private Role role;
 
+  private boolean activo;
+
   @CreationTimestamp
   @Column(name= "created_at")
   private LocalDateTime createdAT;

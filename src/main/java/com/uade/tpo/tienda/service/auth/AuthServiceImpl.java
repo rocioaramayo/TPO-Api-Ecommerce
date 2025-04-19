@@ -69,6 +69,7 @@ public AuthenticationResponse register(RegisterRequest request) {
     if(role==null){
         role=Role.COMPRADOR;
     }
+    boolean activo = true;
 
     if(role==Role.ADMIN){
         boolean adminYaExiste = usuarioRepository.existsByRole(Role.ADMIN);
@@ -83,6 +84,7 @@ public AuthenticationResponse register(RegisterRequest request) {
         .firstName(request.getFirstName())
         .lastName(request.getLastName())
         .role(role)
+        .activo(activo)
         .build();
 
     usuarioRepository.save(user);

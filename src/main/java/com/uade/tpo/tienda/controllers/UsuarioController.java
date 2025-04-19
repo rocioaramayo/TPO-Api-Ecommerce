@@ -52,7 +52,7 @@ public ResponseEntity<Usuario> obtenerUsuarioPorId(@PathVariable Long id) {
   @DeleteMapping("/{id}")
   public ResponseEntity<Usuario> eliminarUsuario(@PathVariable Long id)
   {
-    usuarioService.eliminarUsuario(id);
+    usuarioService.desactivarUsuario(id);
     return ResponseEntity.noContent().build();
 
   }

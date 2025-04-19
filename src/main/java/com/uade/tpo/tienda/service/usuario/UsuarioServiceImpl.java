@@ -51,8 +51,15 @@ public class UsuarioServiceImpl implements UsuarioService{
   }
 
   @Override
-  public void eliminarUsuario(Long id) {
-    usuarioRepository.deleteById(id);
+  public void desactivarUsuario(Long id) {
+    Optional<Usuario> usuarioOpt = usuarioRepository.findById(id);
+    if (!usuarioOpt.isPresent()) {
+      throw new UsuarioNoEncontradoException();
+    }
+    Usuario existing = usuarioOpt.get();
+    existing.setActivo(false);
+    usuarioRepository.save(existing);
+    
   }
   
 }
