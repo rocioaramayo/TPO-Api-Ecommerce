@@ -31,7 +31,7 @@ La aplicación ofrece funcionalidades para:
 
 ### 🧑‍💻 Gestión de Usuarios
 
-- Registro como **comprador** o **vendedor** (nombre de usuario, mail, contraseña, nombre y apellido)
+- Registro como **comprador** (nombre de usuario, mail, contraseña, nombre y apellido)
 - Inicio de sesión (login)
 - Administración de permisos
 
