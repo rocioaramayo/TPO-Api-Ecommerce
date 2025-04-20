@@ -31,7 +31,7 @@ La aplicación ofrece funcionalidades para:
 
 ### 🧑‍💻 Gestión de Usuarios
 
-- Registro como **comprador** o **vendedor** (nombre de usuario, mail, contraseña, nombre y apellido)
+- Registro como **comprador** (nombre de usuario, mail, contraseña, nombre y apellido)
 - Inicio de sesión (login)
 - Administración de permisos
 
@@ -49,7 +49,7 @@ La aplicación ofrece funcionalidades para:
 - Checkout del carrito con cálculo automático del total
 - Descuento de stock al finalizar compra (con validación)
 
-### 🛠️ Gestión de Productos (para Vendedores)
+### 🛠️ Gestión de Productos (para Admin)
 
 - Publicación de productos con fotos, descripción, categoría y precio
 - Control de stock por parte del vendedor
