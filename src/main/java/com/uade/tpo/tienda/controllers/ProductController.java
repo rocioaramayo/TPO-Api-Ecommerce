@@ -88,7 +88,8 @@ public class ProductController {
 
     @GetMapping("/detalle/{id}")
     public ResponseEntity<ProductResponse> getProductDetail(@PathVariable Long id) {
-        Producto producto = productService.getProductById(id); // si no existe, lanza excepción
+        Producto producto = productService.getProductById(id);
+    
         return ResponseEntity.ok(mapToProductResponse(producto));
     }
 
@@ -97,14 +98,13 @@ public class ProductController {
     public ResponseEntity<Page<ProductResponse>> getProducts(
         @RequestParam(required = false) Integer page,
         @RequestParam(required = false) Integer size) {
+    
         Page<Producto> productos;
         if (page == null || size == null) {
             productos = productService.getProducts(PageRequest.of(0, Integer.MAX_VALUE));
         } else {
             productos = productService.getProducts(PageRequest.of(page, size));
         }
-      
-        // mapeo Producto a ProductResponse
         Page<ProductResponse> responsePage = productos.map(this::mapToProductResponse);
         return ResponseEntity.ok(responsePage);
     }
@@ -116,11 +116,37 @@ public class ProductController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Producto> updateProduct(@PathVariable Long id, @RequestBody Producto producto) {
-        Producto updated= productService.updateProduct(id,producto);
+    public ResponseEntity<Producto> updateProduct(@PathVariable Long id, @RequestBody ProductRequest request) {
+        Optional<Categoria> categoriaOpt = categoryService.getCategoryById(request.getCategoryId());
+        if (!categoriaOpt.isPresent()) {
+            return ResponseEntity.badRequest().build();
+        }
+    
+        Categoria categoria = categoriaOpt.get();
+    
+        Producto producto = Producto.builder()
+            .nombre(request.getNombre())
+            .descripcion(request.getDescripcion())
+            .precio(request.getPrecio())
+            .stock(request.getStock())
+            .categoria(categoria)
+            .fotos(request.getFotos().stream().map(foto ->
+                FotoProducto.builder()
+                    .url(foto.getUrl())
+                    .descripcion(foto.getDescripcion())
+                    .build()
+            ).toList())
+            .build();
+    
+        Producto updated = productService.updateProduct(id, producto);
         return ResponseEntity.ok(updated);
     }
-
+    
+    @PutMapping("/activar/{id}")
+    public ResponseEntity<Producto> activarProducto(@PathVariable Long id) {
+        Producto activado = productService.activarProducto(id);
+        return ResponseEntity.ok(activado);
+    }
     @PutMapping("stock/{id}")
     public ResponseEntity<Producto> updateStockProduct (@PathVariable Long id, @RequestBody StockRequest stockRequest) {
         Producto updated = productService.updateStockProduct(id, stockRequest.getStock());
@@ -152,17 +178,17 @@ public class ProductController {
             .build();
 }
 @GetMapping("/filtrar")
-public ResponseEntity<List<ProductResponse>> filtrarProductos(
-        @RequestParam(required = false) String nombre,
-        @RequestParam(required = false) String categoria,
-        @RequestParam(required = false) Double precioMax) {
+    public ResponseEntity<List<ProductResponse>> filtrarProductos(
+            @RequestParam(required = false) String nombre,
+            @RequestParam(required = false) String categoria,
+            @RequestParam(required = false) Double precioMax) {
 
-    List<Producto> productosFiltrados = productService.filtrarProductos(nombre, categoria, precioMax);
-    List<ProductResponse> response = productosFiltrados.stream()
-        .map(this::mapToProductResponse)
-        .toList();
+        List<Producto> productosFiltrados = productService.filtrarProductos(nombre, categoria, precioMax);
+        List<ProductResponse> response = productosFiltrados.stream()
+            .map(this::mapToProductResponse)
+            .toList();
 
-    return ResponseEntity.ok(response);
+        return ResponseEntity.ok(response);
 }
 
 

@@ -61,4 +61,6 @@ public class Producto {
     @CreationTimestamp
     @Column(name = "created_at")
     private LocalDateTime createdAt;
+    @Column
+    private boolean activo;
 }

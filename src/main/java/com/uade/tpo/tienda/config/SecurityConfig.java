@@ -51,10 +51,11 @@ public class SecurityConfig {
                 .requestMatchers("/categories/**").permitAll()
 
                 // productos
-                // ADMIN puede crear, modificar y eliminar
+                // ADMIN puede crear, modificar,activar y eliminar
                 .requestMatchers(HttpMethod.POST, "/productos").hasAuthority(Role.ADMIN.name())
                 .requestMatchers(HttpMethod.PUT, "/productos/**").hasAuthority(Role.ADMIN.name())
                 .requestMatchers(HttpMethod.DELETE, "/productos/**").hasAuthority(Role.ADMIN.name())
+                .requestMatchers(HttpMethod.PUT, "/productos/activar/**").hasAuthority(Role.ADMIN.name())
                 // Cualquier persona puede ver productos y filtrarlos
                 .requestMatchers(HttpMethod.GET, "/productos/**").permitAll()
 

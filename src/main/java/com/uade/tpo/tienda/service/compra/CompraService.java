@@ -14,6 +14,7 @@ import com.uade.tpo.tienda.entity.Compra;
 import com.uade.tpo.tienda.entity.CompraItem;
 import com.uade.tpo.tienda.entity.Producto;
 import com.uade.tpo.tienda.entity.Usuario;
+import com.uade.tpo.tienda.exceptions.ProductoInactivoException;
 import com.uade.tpo.tienda.exceptions.ProductoNoEncontradoException;
 import com.uade.tpo.tienda.exceptions.StockInsuficienteException;
 import com.uade.tpo.tienda.exceptions.UsuarioInactivoException;
@@ -58,7 +59,10 @@ public class CompraService implements InterfazCompraService {
         for (CompraItemRequest itemReq : request.getItems()) {
             Producto producto = productoRepository.findById(itemReq.getProductoId())
                 .orElseThrow(ProductoNoEncontradoException::new);
-    
+            if (!producto.isActivo()) {
+            throw new ProductoInactivoException(); 
+            }
+
             if (producto.getStock() < itemReq.getCantidad()) {
                 throw new StockInsuficienteException();
             }
