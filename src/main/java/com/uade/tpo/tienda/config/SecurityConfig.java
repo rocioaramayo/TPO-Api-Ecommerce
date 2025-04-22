@@ -35,9 +35,6 @@ public class SecurityConfig {
                 // endpoints públicos: autenticación y errores
                 .requestMatchers("/api/v1/auth/**", "/error/**").permitAll()
 
-                // gestión de usuarios: solo ADMIN puede acceder
-                .requestMatchers("/usuarios/**").hasAuthority(Role.ADMIN.name())
-
                 // compras
                 // COMPRADOR ve sus propias compras
                 .requestMatchers(HttpMethod.GET, "/compras/mias").hasAuthority(Role.COMPRADOR.name())
@@ -49,7 +46,9 @@ public class SecurityConfig {
                 .requestMatchers("/categories/create").hasAuthority(Role.ADMIN.name())
                 // Todos pueden ver categorías
                 .requestMatchers("/categories/**").permitAll()
-
+                //permisos en auth 
+                .requestMatchers(HttpMethod.GET, "/api/v1/auth/me").authenticated()
+                .requestMatchers(HttpMethod.GET, "/api/v1/auth/users/**").hasAuthority(Role.ADMIN.name())
                 // productos
                 // ADMIN puede crear, modificar,activar y eliminar
                 .requestMatchers(HttpMethod.POST, "/productos").hasAuthority(Role.ADMIN.name())

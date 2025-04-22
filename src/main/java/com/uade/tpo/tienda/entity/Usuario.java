@@ -1,4 +1,5 @@
 package com.uade.tpo.tienda.entity;
+
 import com.uade.tpo.tienda.enums.*;
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -10,83 +11,83 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data                    
-@NoArgsConstructor        // Genera un constructor sin argumentos (requerido por JPA)
-@AllArgsConstructor       // Genera un constructor con argumentos para todos los campos
-@Builder                 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Entity
 public class Usuario implements UserDetails {
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
-  //no puede estar vacia y debe ser unica
-  @Column(nullable = false, unique = true)
-  private String username;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-  @Column(nullable = false, unique = true)
-  private String email;
+    @Column(nullable = false, unique = true)
+    private String username;
 
-  @Column(nullable = false)
-  private String password;
+    @Column(nullable = false, unique = true)
+    private String email;
 
-  @Column(name = "first_name", nullable = false)
-  private String firstName;
+    @Column(nullable = false)
+    private String password;
 
-  @Column(name = "last_name", nullable = false)
-  private String lastName;
+    @Column(name = "first_name", nullable = false)
+    private String firstName;
 
-  @Enumerated(EnumType.STRING)
-  @Column(nullable = false)
-  private Role role;
+    @Column(name = "last_name", nullable = false)
+    private String lastName;
 
-  private boolean activo;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
 
-  @CreationTimestamp
-  @Column(name= "created_at")
-  private LocalDateTime createdAT;
+    private boolean activo;
 
+    @CreationTimestamp
+    @Column(name = "created_at")
+    private LocalDateTime createdAT;
 
-  
-@Override
-public Collection<? extends GrantedAuthority> getAuthorities() {
-    return List.of(() -> role.name());
-}
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(() -> role.name());
+    }
+    
+    public String getLoginName() {
+        return this.username;
+    }
+    @Override
+    public String getUsername() {
+        return email; // o username si querés
+    }
 
-@Override
-public String getUsername() {
-    return email; // o username si querés
-}
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
 
-@Override
-public boolean isAccountNonExpired() {
-    return true;
-}
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
 
-@Override
-public boolean isAccountNonLocked() {
-    return true;
-}
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
 
-@Override
-public boolean isCredentialsNonExpired() {
-    return true;
-}
-
-@Override
-public boolean isEnabled() {
-    return true;
-}
-
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
 }
