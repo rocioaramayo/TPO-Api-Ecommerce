@@ -59,8 +59,13 @@ public class SecurityConfig {
                 // Cualquier persona puede ver productos y filtrarlos
                 .requestMatchers(HttpMethod.GET, "/productos/**").permitAll()
 
+                //Cambio de contraseña
+                .requestMatchers(HttpMethod.POST, "/api/v1/auth/change-password").authenticated()
+                .requestMatchers(HttpMethod.POST, "/api/v1/auth/admin/change-password").hasAuthority(Role.ADMIN.name())
+
                 // 🔐 Todo lo que no esté especificado, requiere estar autenticado
                 .anyRequest().authenticated()
+
             )
 
             .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))

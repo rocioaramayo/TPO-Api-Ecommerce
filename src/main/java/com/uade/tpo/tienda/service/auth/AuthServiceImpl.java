@@ -11,7 +11,9 @@ import com.uade.tpo.tienda.exceptions.UsuarioInactivoException;
 import com.uade.tpo.tienda.exceptions.UsuarioNoEncontradoException;
 import com.uade.tpo.tienda.exceptions.UsuarioYaExisteException;
 import com.uade.tpo.tienda.repository.UsuarioRepository;
-
+import com.uade.tpo.tienda.dto.ChangePasswordRequest;
+import com.uade.tpo.tienda.dto.AdminChangePasswordRequest;
+import org.springframework.security.core.context.SecurityContextHolder;
 import lombok.RequiredArgsConstructor;
 
 
@@ -103,4 +105,29 @@ public AuthenticationResponse register(RegisterRequest request) {
         .token(jwtToken)
         .build();
 }
+@Override
+public void changeOwnPassword(ChangePasswordRequest req) {
+    // tomo el email del usuario logueado
+    String email = SecurityContextHolder.getContext().getAuthentication().getName();
+    Usuario user = usuarioRepository.findByEmail(email)
+        .orElseThrow(UsuarioNoEncontradoException::new);
+    // valido que la contraseña actual coincida
+    if (!passwordEncoder.matches(req.getOldPassword(), user.getPassword())) {
+        throw new IllegalArgumentException("Contraseña actual inválida");
+    }
+    // guardo la nueva
+    user.setPassword(passwordEncoder.encode(req.getNewPassword()));
+    usuarioRepository.save(user);
+}
+
+@Override
+public void changeAnyPassword(AdminChangePasswordRequest req) {
+    // sólo admin 
+    Usuario target = usuarioRepository.findByEmail(req.getEmail())
+        .orElseThrow(UsuarioNoEncontradoException::new);
+    target.setPassword(passwordEncoder.encode(req.getNewPassword()));
+    usuarioRepository.save(target);
+}
+
+
 }
