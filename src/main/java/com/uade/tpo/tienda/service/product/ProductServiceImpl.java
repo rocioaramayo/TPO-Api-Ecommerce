@@ -8,8 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.uade.tpo.tienda.dto.PhotoResponse;
-import com.uade.tpo.tienda.dto.ProductResponse;
+
 import com.uade.tpo.tienda.entity.Producto;
 import com.uade.tpo.tienda.exceptions.FaltanDatosException;
 import com.uade.tpo.tienda.exceptions.ProductoInactivoException;

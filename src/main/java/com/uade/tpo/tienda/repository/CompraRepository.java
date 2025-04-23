@@ -7,9 +7,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
  
 import com.uade.tpo.tienda.entity.Compra;
+import com.uade.tpo.tienda.entity.Producto;
 import com.uade.tpo.tienda.entity.Usuario;
  
 @Repository
 public interface CompraRepository extends JpaRepository<Compra, Long> {
    List<Compra> findByUsuario(Usuario usuario);
+   boolean existsByUsuarioAndItemsProducto(Usuario usuario, Producto producto);
 }

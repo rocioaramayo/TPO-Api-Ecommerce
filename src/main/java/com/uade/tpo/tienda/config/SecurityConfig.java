@@ -34,7 +34,9 @@ public class SecurityConfig {
 
                 // endpoints públicos: autenticación y errores
                 .requestMatchers("/api/v1/auth/**", "/error/**").permitAll()
-
+                //los que
+                .requestMatchers(HttpMethod.POST, "/reviews").hasAuthority("COMPRADOR")
+                .requestMatchers(HttpMethod.GET, "/reviews/**").permitAll()
                 // compras
                 // COMPRADOR ve sus propias compras
                 .requestMatchers(HttpMethod.GET, "/compras/mias").hasAuthority(Role.COMPRADOR.name())
