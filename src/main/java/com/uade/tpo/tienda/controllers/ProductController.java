@@ -175,6 +175,7 @@ public class ProductController {
             .categoria(producto.getCategoria().getNombre())  
             .fotos(photoResponses)
             .createdAt(producto.getCreatedAt())
+            .pocoStock(producto.getStock() < 5)
             .build();
 }
 @GetMapping("/filtrar")

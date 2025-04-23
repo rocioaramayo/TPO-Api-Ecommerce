@@ -20,4 +20,5 @@ public class ProductResponse {
     private String categoria;    // Por ejemplo, el nombre o descripción de la categoría
     private List<PhotoResponse> fotos;
     private LocalDateTime createdAt;
+    private boolean pocoStock;
 }
