@@ -27,50 +27,59 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            // Desactiva CSRF porque usamos JWT (stateless)
+            // 1. Stateless, sin CSRF
             .csrf(AbstractHttpConfigurer::disable)
+            .sessionManagement(sm -> sm.sessionCreationPolicy(STATELESS))
 
-            .authorizeHttpRequests(req -> req
+            // 2. Reglas de acceso
+            .authorizeHttpRequests(auth -> auth
 
-                // endpoints públicos: autenticación y errores
+                //   a) Público: auth, errores, catálogo y reviews (GET)
                 .requestMatchers("/api/v1/auth/**", "/error/**").permitAll()
-                //los que
-                .requestMatchers(HttpMethod.POST, "/reviews").hasAuthority("COMPRADOR")
-                .requestMatchers(HttpMethod.GET, "/reviews/**").permitAll()
-                // compras
-                // COMPRADOR ve sus propias compras
-                .requestMatchers(HttpMethod.GET, "/compras/mias").hasAuthority(Role.COMPRADOR.name())
-                // ADMIN ve todas las compras
-                .requestMatchers(HttpMethod.GET, "/compras").hasAuthority(Role.ADMIN.name())
-
-                // categorías
-                // Solo ADMIN puede crear
-                .requestMatchers("/categories/create").hasAuthority(Role.ADMIN.name())
-                // Todos pueden ver categorías
-                .requestMatchers("/categories/**").permitAll()
-                //permisos en auth 
-                .requestMatchers(HttpMethod.GET, "/api/v1/auth/me").authenticated()
-                .requestMatchers(HttpMethod.GET, "/api/v1/auth/users/**").hasAuthority(Role.ADMIN.name())
-                // productos
-                // ADMIN puede crear, modificar,activar y eliminar
-                .requestMatchers(HttpMethod.POST, "/productos").hasAuthority(Role.ADMIN.name())
-                .requestMatchers(HttpMethod.PUT, "/productos/**").hasAuthority(Role.ADMIN.name())
-                .requestMatchers(HttpMethod.DELETE, "/productos/**").hasAuthority(Role.ADMIN.name())
-                .requestMatchers(HttpMethod.PUT, "/productos/activar/**").hasAuthority(Role.ADMIN.name())
-                // Cualquier persona puede ver productos y filtrarlos
                 .requestMatchers(HttpMethod.GET, "/productos/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/categories/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/reviews/**").permitAll()
 
-                //Cambio de contraseña
-                .requestMatchers(HttpMethod.POST, "/api/v1/auth/change-password").authenticated()
-                .requestMatchers(HttpMethod.POST, "/api/v1/auth/admin/change-password").hasAuthority(Role.ADMIN.name())
+                //   b) Reviews: POST solo COMPRADOR
+                .requestMatchers(HttpMethod.POST, "/reviews")
+                    .hasAuthority(Role.COMPRADOR.name())
 
-                // 🔐 Todo lo que no esté especificado, requiere estar autenticado
+                //   c) Compras
+                .requestMatchers(HttpMethod.POST, "/compras")
+                    .hasAuthority(Role.COMPRADOR.name())
+                .requestMatchers(HttpMethod.GET, "/compras/mias")
+                    .hasAuthority(Role.COMPRADOR.name())
+                .requestMatchers(HttpMethod.GET, "/compras")
+                    .hasAuthority(Role.ADMIN.name())
+
+                //   d) Categorías
+                .requestMatchers(HttpMethod.POST, "/categories/create")
+                    .hasAuthority(Role.ADMIN.name())
+
+                //   e) Gestión de usuarios
+                .requestMatchers(HttpMethod.GET,  "/api/v1/users/me")
+                    .authenticated()
+                .requestMatchers("/api/v1/users/**")
+                    .hasAuthority(Role.ADMIN.name())
+
+                //   f) Cambios de contraseña
+                .requestMatchers(HttpMethod.POST, "/api/v1/auth/change-password")
+                    .authenticated()
+                .requestMatchers(HttpMethod.POST, "/api/v1/auth/admin/change-password")
+                    .hasAuthority(Role.ADMIN.name())
+
+                //   g) Productos (CRUD solo ADMIN)
+                .requestMatchers(HttpMethod.POST,   "/productos").hasAuthority(Role.ADMIN.name())
+                .requestMatchers(HttpMethod.PUT,    "/productos/**").hasAuthority(Role.ADMIN.name())
+                .requestMatchers(HttpMethod.DELETE, "/productos/**").hasAuthority(Role.ADMIN.name())
+                .requestMatchers(HttpMethod.PUT,    "/productos/activar/**").hasAuthority(Role.ADMIN.name())
+                .requestMatchers(HttpMethod.PUT,    "/productos/stock/**").hasAuthority(Role.ADMIN.name())
+
+                //   h) Resto de rutas: autenticado
                 .anyRequest().authenticated()
-
             )
 
-            .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
-
+            // 3. JWT filter
             .authenticationProvider(authenticationProvider)
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
