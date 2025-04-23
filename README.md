@@ -4,7 +4,7 @@ Plataforma de e-commerce desarrollada como trabajo práctico obligatorio para la
 El proyecto consiste en una página web para la compra y venta de productos de cuero, que permite tanto a compradores como a vendedores interactuar con el sistema.
 
 ---
-
+documentacíon <a href="https://docs.google.com/document/d/1agyOYNWbXgedUqSZviJQ2macHlWCqZ-7/edit"> ir al docs</a>
 ## 🚀 Tecnologías Utilizadas
 
 - **Backend:** Java + Spring Boot  
