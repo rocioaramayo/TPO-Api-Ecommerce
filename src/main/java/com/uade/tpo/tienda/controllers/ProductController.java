@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.uade.tpo.tienda.dto.PhotoResponse;
+import com.uade.tpo.tienda.dto.ProductPageResponse;
 import com.uade.tpo.tienda.dto.ProductRequest;
 import com.uade.tpo.tienda.dto.ProductResponse;
 import com.uade.tpo.tienda.dto.StockRequest;
@@ -95,19 +96,33 @@ public class ProductController {
 
     // listar productos
     @GetMapping
-    public ResponseEntity<Page<ProductResponse>> getProducts(
-        @RequestParam(required = false) Integer page,
-        @RequestParam(required = false) Integer size) {
-    
-        Page<Producto> productos;
-        if (page == null || size == null) {
-            productos = productService.getProducts(PageRequest.of(0, Integer.MAX_VALUE));
-        } else {
-            productos = productService.getProducts(PageRequest.of(page, size));
-        }
-        Page<ProductResponse> responsePage = productos.map(this::mapToProductResponse);
-        return ResponseEntity.ok(responsePage);
+public ResponseEntity<ProductPageResponse> getProducts(
+    @RequestParam(required = false) Integer page,
+    @RequestParam(required = false) Integer size) {
+
+    Page<Producto> productos;
+    if (page == null || size == null) {
+        productos = productService.getProducts(PageRequest.of(0, Integer.MAX_VALUE));
+    } else {
+        productos = productService.getProducts(PageRequest.of(page, size));
     }
+
+    List<ProductResponse> responseList = productos
+        .stream()
+        .map(this::mapToProductResponse)
+        .toList();
+
+    ProductPageResponse response = ProductPageResponse.builder()
+        .productos(responseList)
+        .totalProductos(productos.getTotalElements())
+        .paginaActual(productos.getNumber())
+        .tamañoPagina(productos.getSize())
+        .build();
+
+    return ResponseEntity.ok(response);
+}
+
+    
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id){
         productService.deleteProduct(id);

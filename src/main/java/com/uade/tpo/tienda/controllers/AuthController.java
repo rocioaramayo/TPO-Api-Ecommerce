@@ -6,6 +6,7 @@ import com.uade.tpo.tienda.dto.ChangePasswordRequest;
 import com.uade.tpo.tienda.dto.LoginRequest;
 import com.uade.tpo.tienda.dto.LoginResponse;
 import com.uade.tpo.tienda.dto.RegisterRequest;
+import com.uade.tpo.tienda.dto.RegisterResponse;
 import com.uade.tpo.tienda.service.auth.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,10 +23,18 @@ public class AuthController {
     @Autowired
     private AuthService authService;
 
-    @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponse> register(@RequestBody RegisterRequest request) {
-        return ResponseEntity.ok(authService.register(request));
-    }
+@PostMapping("/register")
+public ResponseEntity<RegisterResponse> register(@RequestBody RegisterRequest request) {
+    AuthenticationResponse authResponse = authService.register(request);
+
+    RegisterResponse response = RegisterResponse.builder()
+        .token(authResponse.getToken())
+        .mensaje("¡El usuario se creó con éxito!")
+        .build();
+
+    return ResponseEntity.ok(response);
+}
+
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
