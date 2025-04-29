@@ -18,7 +18,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
+import org.springframework.security.authentication.BadCredentialsException; 
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
@@ -32,17 +32,36 @@ public class AuthServiceImpl implements AuthService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    
+
     @Override
     public LoginResponse login(LoginRequest request) {
         Usuario user = usuarioRepository.findByEmail(request.getEmail())
             .orElseThrow(UsuarioNoEncontradoException::new);
     
+<<<<<<< Updated upstream
         authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(
                 request.getEmail(),
                 request.getPassword()
             )
         );
+=======
+        if (!user.isActivo()) {
+            throw new UsuarioInactivoException();
+        }
+    
+        try {
+            authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                    request.getEmail(),
+                    request.getPassword()
+                )
+            );
+        } catch (BadCredentialsException ex) {
+            throw new UsuarioNoEncontradoException();
+        }
+>>>>>>> Stashed changes
     
         String jwt = jwtService.generateToken(user);
     
@@ -51,6 +70,13 @@ public class AuthServiceImpl implements AuthService {
             .build();
     }
     
+<<<<<<< Updated upstream
+=======
+
+    
+
+    
+>>>>>>> Stashed changes
     @Override
 public AuthenticationResponse register(RegisterRequest request) {
     if (usuarioRepository.findByEmail(request.getEmail()).isPresent()) {
