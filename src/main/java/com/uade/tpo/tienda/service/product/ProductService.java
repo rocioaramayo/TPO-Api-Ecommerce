@@ -17,5 +17,6 @@ public interface ProductService {
   Producto getProductById(Long id);
   List<Producto> filtrarProductos(String nombre, String categoria, Double precioMax);
   Producto activarProducto(Long id) ;
+  void validarImagenBase64(String contenidoBase64);
 
 }

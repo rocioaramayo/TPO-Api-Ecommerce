@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.uade.tpo.tienda.entity.Producto;
 import com.uade.tpo.tienda.exceptions.FaltanDatosException;
+import com.uade.tpo.tienda.exceptions.ImagenDemasiadoGrandeException;
 import com.uade.tpo.tienda.exceptions.ProductoInactivoException;
 import com.uade.tpo.tienda.exceptions.ProductoNoEncontradoException;
 import com.uade.tpo.tienda.exceptions.ProductoSinImagenesException;
@@ -28,22 +29,27 @@ public class ProductServiceImpl implements ProductService{
           producto.getNombre(),
           producto.getCategoria().getId()
       );
-
+  
       if (productoExiste) {
           throw new ProductoYaExisteException();
       }
-
+  
       // validar que tenga al menos una foto (no nulo y no vacío)
       if (producto.getFotos() == null || producto.getFotos().isEmpty()) {
           throw new ProductoSinImagenesException();
       }
-
+  
+      // Validar tamaño de cada imagen
+      producto.getFotos().forEach(foto -> {
+          validarImagenBase64(foto.getContenidoBase64());
+      });
+  
       // Setear referencia a las fotos
       producto.getFotos().forEach(foto -> foto.setProducto(producto));
-
+  
       // activarlo por defecto
       producto.setActivo(true);
-
+  
       return productRepository.save(producto);
   }
 
@@ -53,44 +59,66 @@ public class ProductServiceImpl implements ProductService{
   }
 
   @Override
-  public Producto updateProduct(Long id, Producto productoUpdated) {
-      Optional<Producto> optionalProducto = productRepository.findById(id);
-      
-      if (optionalProducto.isEmpty()) {
-          throw new ProductoNoEncontradoException();
-      }
-  
-      Producto existing = optionalProducto.get();
-  
-      if (!existing.isActivo()) {
-          throw new ProductoInactivoException(); // si el producto está inactivo, no se puede actualizar
-      }
-  
-      // Validar campos obligatorios (sin exigir fotos vacías)
-      if (productoUpdated.getNombre() == null || 
-          productoUpdated.getDescripcion() == null ||
-          productoUpdated.getPrecio() == null ||
-          productoUpdated.getStock() == null ||
-          productoUpdated.getCategoria() == null ||
-          productoUpdated.getFotos() == null) {
-          throw new FaltanDatosException();
-      }
-  
-      existing.setNombre(productoUpdated.getNombre());
-      existing.setDescripcion(productoUpdated.getDescripcion());
-      existing.setPrecio(productoUpdated.getPrecio());
-      existing.setStock(productoUpdated.getStock());
-      existing.setCategoria(productoUpdated.getCategoria());
-  
-      // si se mandan nuevas fotos, se reemplazan
-      if (!productoUpdated.getFotos().isEmpty()) {
-          existing.getFotos().clear();
-          existing.getFotos().addAll(productoUpdated.getFotos());
-          existing.getFotos().forEach(foto -> foto.setProducto(existing));
-      }
-  
-      return productRepository.save(existing);
-  }
+public Producto updateProduct(Long id, Producto productoUpdated) {
+    Optional<Producto> optionalProducto = productRepository.findById(id);
+    
+    if (optionalProducto.isEmpty()) {
+        throw new ProductoNoEncontradoException();
+    }
+
+    Producto existing = optionalProducto.get();
+
+    if (!existing.isActivo()) {
+        throw new ProductoInactivoException();
+    }
+
+    // Validar campos obligatorios
+    if (productoUpdated.getNombre() == null || 
+        productoUpdated.getDescripcion() == null ||
+        productoUpdated.getPrecio() == null ||
+        productoUpdated.getStock() == null ||
+        productoUpdated.getCategoria() == null) {
+        throw new FaltanDatosException();
+    }
+
+    // Si se proporcionan nuevas fotos, valida su tamaño
+    if (productoUpdated.getFotos() != null && !productoUpdated.getFotos().isEmpty()) {
+        productoUpdated.getFotos().forEach(foto -> {
+            validarImagenBase64(foto.getContenidoBase64());
+        });
+    }
+
+    // Actualizar los campos
+    existing.setNombre(productoUpdated.getNombre());
+    existing.setDescripcion(productoUpdated.getDescripcion());
+    existing.setPrecio(productoUpdated.getPrecio());
+    existing.setStock(productoUpdated.getStock());
+    existing.setCategoria(productoUpdated.getCategoria());
+
+    // si se proporcionan nuevas fotos, reemplazar las existentes
+    if (productoUpdated.getFotos() != null && !productoUpdated.getFotos().isEmpty()) {
+        existing.getFotos().clear();
+        existing.getFotos().addAll(productoUpdated.getFotos());
+        existing.getFotos().forEach(foto -> foto.setProducto(existing));
+    }
+
+    return productRepository.save(existing);
+}
+  public void validarImagenBase64(String contenidoBase64) {
+    if (contenidoBase64 == null || contenidoBase64.isEmpty()) {
+        throw new IllegalArgumentException("La imagen no puede estar vacía");
+    }
+    
+    // calcular tamaño aproximado en bytes
+    int tamanoAprox = contenidoBase64.length() * 3 / 4; // aproximación del tamaño en bytes
+    
+    // establecer un límite, por ejemplo 2MB
+    final int LIMITE_TAMANO = 2 * 1024 * 1024; // 2MB
+    
+    if (tamanoAprox > LIMITE_TAMANO) {
+        throw new ImagenDemasiadoGrandeException();
+    }
+}
   @Override
 public Producto activarProducto(Long id) {
     Optional<Producto> productoOpt = productRepository.findById(id);

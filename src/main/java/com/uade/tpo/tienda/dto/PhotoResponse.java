@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class PhotoResponse {
     private Long id;
-    private String url;
+    private String contenidoBase64;
+    private String tipoContenido;
     private String descripcion;
 }

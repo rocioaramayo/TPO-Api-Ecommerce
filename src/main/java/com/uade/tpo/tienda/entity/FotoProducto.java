@@ -12,6 +12,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -31,15 +32,20 @@ public class FotoProducto {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Muchos fotos pertenecen a un producto
     @ManyToOne 
     @JoinColumn(name = "producto_id", nullable = false)
     @JsonBackReference
     private Producto producto;
 
+    // Almacenar el contenido Base64 de la imagen
+    @Lob
+    @Column(nullable = false, columnDefinition = "LONGTEXT")
+    private String contenidoBase64;
+    
+    // Guardar el tipo de contenido (MIME type)
     @Column(nullable = false)
-    private String url;
-
+    private String tipoContenido; // e.g., "image/jpeg", "image/png"
+    
     private String descripcion;
 
     @CreationTimestamp

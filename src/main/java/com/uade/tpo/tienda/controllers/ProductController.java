@@ -57,18 +57,19 @@ public class ProductController {
         
         
         // transformar la lista de PhotoRequest en entidad FotoProducto
+        // transformar la lista de PhotoRequest en entidad FotoProducto
         List<FotoProducto> fotos = null;
         if (request.getFotos() != null && !request.getFotos().isEmpty()) {
             fotos = request.getFotos().stream().map(photoReq ->
                 FotoProducto.builder()
-                    .url(photoReq.getUrl())
+                    .contenidoBase64(photoReq.getContenidoBase64())
+                    .tipoContenido(photoReq.getTipoContenido())
                     .descripcion(photoReq.getDescripcion())
                     .build()
             ).collect(Collectors.toList());
-        }else{
+        } else {
             throw new ProductoSinImagenesException();
         }
-        
         // construir Producto 
         Producto producto = Producto.builder()
                 .nombre(request.getNombre())
@@ -139,18 +140,25 @@ public ResponseEntity<ProductPageResponse> getProducts(
     
         Categoria categoria = categoriaOpt.get();
     
+        // Procesar las fotos con Base64
+        List<FotoProducto> fotos = null;
+        if (request.getFotos() != null && !request.getFotos().isEmpty()) {
+            fotos = request.getFotos().stream().map(photoReq ->
+                FotoProducto.builder()
+                    .contenidoBase64(photoReq.getContenidoBase64())
+                    .tipoContenido(photoReq.getTipoContenido())
+                    .descripcion(photoReq.getDescripcion())
+                    .build()
+            ).collect(Collectors.toList());
+        }
+    
         Producto producto = Producto.builder()
             .nombre(request.getNombre())
             .descripcion(request.getDescripcion())
             .precio(request.getPrecio())
             .stock(request.getStock())
             .categoria(categoria)
-            .fotos(request.getFotos().stream().map(foto ->
-                FotoProducto.builder()
-                    .url(foto.getUrl())
-                    .descripcion(foto.getDescripcion())
-                    .build()
-            ).toList())
+            .fotos(fotos)
             .build();
     
         Producto updated = productService.updateProduct(id, producto);
@@ -168,31 +176,32 @@ public ResponseEntity<ProductPageResponse> getProducts(
         return ResponseEntity.ok(updated);
     }
 
-  private ProductResponse mapToProductResponse(Producto producto) {
-    // Mapear las fotos
-    List<PhotoResponse> photoResponses = null;
-    if (producto.getFotos() != null) {
-        photoResponses = producto.getFotos().stream()
-            .map(foto -> PhotoResponse.builder()
-                .id(foto.getId())
-                .url(foto.getUrl())
-                .descripcion(foto.getDescripcion())
-                .build())
-            .collect(Collectors.toList());
+    private ProductResponse mapToProductResponse(Producto producto) {
+        // Mapear las fotos
+        List<PhotoResponse> photoResponses = null;
+        if (producto.getFotos() != null) {
+            photoResponses = producto.getFotos().stream()
+                .map(foto -> PhotoResponse.builder()
+                    .id(foto.getId())
+                    .contenidoBase64(foto.getContenidoBase64())
+                    .tipoContenido(foto.getTipoContenido())
+                    .descripcion(foto.getDescripcion())
+                    .build())
+                .collect(Collectors.toList());
+        }
+        
+        return ProductResponse.builder()
+                .id(producto.getId())
+                .nombre(producto.getNombre())
+                .descripcion(producto.getDescripcion())
+                .precio(producto.getPrecio())
+                .stock(producto.getStock())
+                .categoria(producto.getCategoria().getNombre())  
+                .fotos(photoResponses)
+                .createdAt(producto.getCreatedAt())
+                .pocoStock(producto.getStock() < 5)
+                .build();
     }
-    
-    return ProductResponse.builder()
-            .id(producto.getId())
-            .nombre(producto.getNombre())
-            .descripcion(producto.getDescripcion())
-            .precio(producto.getPrecio())
-            .stock(producto.getStock())
-            .categoria(producto.getCategoria().getNombre())  
-            .fotos(photoResponses)
-            .createdAt(producto.getCreatedAt())
-            .pocoStock(producto.getStock() < 5)
-            .build();
-}
 @GetMapping("/filtrar")
     public ResponseEntity<List<ProductResponse>> filtrarProductos(
             @RequestParam(required = false) String nombre,
@@ -208,5 +217,5 @@ public ResponseEntity<ProductPageResponse> getProducts(
 }
 
 
-
+    
 }
