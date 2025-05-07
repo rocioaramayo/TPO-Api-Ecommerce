@@ -43,20 +43,32 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void habilitarUsuario(Long id) {
+    public String habilitarUsuario(Long id) {
         Usuario user = usuarioRepository.findById(id)
-            .orElseThrow(UsuarioNoEncontradoException::new);
+            .orElseThrow(() -> new UsuarioNoEncontradoException("Usuario con ID " + id + " no encontrado"));
+        
+        if (user.isActivo()) {
+            return "El usuario " + user.getLoginName() + " ya se encuentra activo.";
+        }
+        
         user.setActivo(true);
         usuarioRepository.save(user);
+        return "Usuario " + user.getLoginName()+ " habilitado exitosamente.";
     }
 
     @Override
     @Transactional
-    public void deshabilitarUsuario(Long id) {
+    public String deshabilitarUsuario(Long id) {
         Usuario user = usuarioRepository.findById(id)
-            .orElseThrow(UsuarioNoEncontradoException::new);
+            .orElseThrow(() -> new UsuarioNoEncontradoException("Usuario con ID " + id + " no encontrado"));
+        
+        if (!user.isActivo()) {
+            return "El usuario " + user.getLoginName() + " ya se encuentra deshabilitado.";
+        }
+        
         user.setActivo(false);
         usuarioRepository.save(user);
+        return "Usuario " + user.getLoginName() + " deshabilitado exitosamente.";
     }
 
     private UsuarioResponse mapToResponse(Usuario u) {

@@ -1,6 +1,8 @@
 package com.uade.tpo.tienda.controllers;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -38,15 +40,19 @@ public class UserController {
 
    
     @PutMapping("/{id}/habilitar")
-    public ResponseEntity<Void> habilitar(@PathVariable Long id) {
-        userService.habilitarUsuario(id);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Map<String, String>> habilitar(@PathVariable Long id) {
+        String mensaje = userService.habilitarUsuario(id);
+        Map<String, String> response = new HashMap<>();
+        response.put("mensaje", mensaje);
+        return ResponseEntity.ok(response);
     }
 
-   
     @PutMapping("/{id}/deshabilitar")
-    public ResponseEntity<Void> deshabilitar(@PathVariable Long id) {
-        userService.deshabilitarUsuario(id);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Map<String, String>> deshabilitar(@PathVariable Long id) {
+        String mensaje = userService.deshabilitarUsuario(id);
+        Map<String, String> response = new HashMap<>();
+        response.put("mensaje", mensaje);
+        return ResponseEntity.ok(response);
     }
+
 }
