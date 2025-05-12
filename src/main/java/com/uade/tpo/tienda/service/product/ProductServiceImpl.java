@@ -2,6 +2,7 @@ package com.uade.tpo.tienda.service.product;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -153,16 +154,52 @@ public Producto getProductById(Long id) {
     return producto;
 }
 @Override
-public List<Producto> filtrarProductos(String nombre, String categoria, Double precioMax) {
+public List<Producto> filtrarProductos(String nombre, Long categoriaId, 
+String tipoCuero, String grosor, 
+String acabado, String color, 
+Double precioMin, Double precioMax) {
     List<Producto> productos = productRepository.findAll();
 
-    return productos.stream()
-        .filter(p -> p.isActivo()) //solo si esta activo 
-        .filter(p -> (nombre == null || p.getNombre().toLowerCase().contains(nombre.toLowerCase())))
-        .filter(p -> (categoria == null || p.getCategoria().getNombre().equalsIgnoreCase(categoria)))
-        .filter(p -> (precioMax == null || p.getPrecio() <= precioMax))
-        .filter(p -> p.getStock() > 0) // solo si tiene stock
-        .toList();
+ return productos.stream()
+        .filter(p -> p.isActivo()) // Solo productos activos
+        .filter(p -> p.getStock() > 0) // Solo productos con stock
+        
+        // Filtrar por nombre (si se proporciona)
+        .filter(p -> nombre == null || 
+                     p.getNombre().toLowerCase().contains(nombre.toLowerCase()))
+        
+        // Filtrar por categoría (si se proporciona)
+        .filter(p -> categoriaId == null || 
+                    (p.getCategoria() != null && 
+                     p.getCategoria().getId().equals(categoriaId)))
+        
+        // Filtrar por tipoCuero (si se proporciona)
+        .filter(p -> tipoCuero == null || 
+                    (p.getTipoCuero() != null && 
+                     p.getTipoCuero().equalsIgnoreCase(tipoCuero)))
+        
+        // Filtrar por grosor (si se proporciona)
+        .filter(p -> grosor == null || 
+                    (p.getGrosor() != null && 
+                     p.getGrosor().equalsIgnoreCase(grosor)))
+        
+        // Filtrar por acabado (si se proporciona)
+        .filter(p -> acabado == null || 
+                    (p.getAcabado() != null && 
+                     p.getAcabado().equalsIgnoreCase(acabado)))
+        
+        // Filtrar por color (si se proporciona)
+        .filter(p -> color == null || 
+                    (p.getColor() != null && 
+                     p.getColor().equalsIgnoreCase(color)))
+        
+        // Filtrar por precio mínimo (si se proporciona)
+        .filter(p -> precioMin == null || p.getPrecio() >= precioMin)
+        
+        // Filtrar por precio máximo (si se proporciona)
+        .filter(p -> precioMax == null || p.getPrecio() <= precioMax)
+        
+        .collect(Collectors.toList());
 }
 
 @Override

@@ -18,4 +18,10 @@ public class ProductRequest {
     private Integer stock;
     private Long categoryId;  // ID de la categoría a la que pertenece el producto
     private List<PhotoRequest> fotos;// Lista de fotos a asociar al productos
+    private String tipoCuero;
+    private String grosor;
+    private String acabado;
+    private String color;
+    private String textura;
+    private String instruccionesCuidado;
 }

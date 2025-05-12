@@ -63,4 +63,23 @@ public class Producto {
     private LocalDateTime createdAt;
     @Column
     private boolean activo;
+//atributos expecificos
+    @Column(name = "tipo_cuero")
+    private String tipoCuero; // "Plena flor", "Nobuck", "Anilina", etc.
+    
+    @Column(name = "grosor")
+    private String grosor; // "Fino", "Medio", "Grueso"
+    
+    @Column(name = "acabado")
+    private String acabado; // "Mate", "Brillante", "Vintage"
+    
+    @Column(name = "color")
+    private String color;
+    
+    @Column(name = "textura")
+    private String textura; // "Liso", "Grabado", "Rugoso"
+    
+    // Campo para instrucciones de cuidado (segunda mejora)
+    @Column(name = "instrucciones_cuidado", columnDefinition = "TEXT")
+    private String instruccionesCuidado;
 }

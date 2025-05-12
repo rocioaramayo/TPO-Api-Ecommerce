@@ -78,6 +78,12 @@ public class ProductController {
                 .stock(request.getStock())
                 .categoria(categoria)
                 .fotos(fotos)   
+                .tipoCuero(request.getTipoCuero())
+                .grosor(request.getGrosor())
+                .acabado(request.getAcabado()) 
+                .color(request.getColor())
+                .textura(request.getTextura())
+                .instruccionesCuidado(request.getInstruccionesCuidado())
                 .build();
                 
         // 5. Persistir el producto 
@@ -159,6 +165,12 @@ public ResponseEntity<ProductPageResponse> getProducts(
             .stock(request.getStock())
             .categoria(categoria)
             .fotos(fotos)
+            .tipoCuero(request.getTipoCuero())
+            .grosor(request.getGrosor())
+            .acabado(request.getAcabado())
+            .color(request.getColor())
+            .textura(request.getTextura())
+            .instruccionesCuidado(request.getInstruccionesCuidado())
             .build();
     
         Producto updated = productService.updateProduct(id, producto);
@@ -191,24 +203,37 @@ public ResponseEntity<ProductPageResponse> getProducts(
         }
         
         return ProductResponse.builder()
-                .id(producto.getId())
-                .nombre(producto.getNombre())
-                .descripcion(producto.getDescripcion())
-                .precio(producto.getPrecio())
-                .stock(producto.getStock())
-                .categoria(producto.getCategoria().getNombre())  
-                .fotos(photoResponses)
-                .createdAt(producto.getCreatedAt())
-                .pocoStock(producto.getStock() < 5)
-                .build();
+        .id(producto.getId())
+        .nombre(producto.getNombre())
+        .descripcion(producto.getDescripcion())
+        .precio(producto.getPrecio())
+        .stock(producto.getStock())
+        .categoria(producto.getCategoria().getNombre())  
+        .fotos(photoResponses)
+        .createdAt(producto.getCreatedAt())
+        .pocoStock(producto.getStock() < 5)
+        // Nuevos campos
+        .tipoCuero(producto.getTipoCuero())
+        .grosor(producto.getGrosor())
+        .acabado(producto.getAcabado())
+        .color(producto.getColor())
+        .textura(producto.getTextura())
+        .instruccionesCuidado(producto.getInstruccionesCuidado())
+        .build();
     }
 @GetMapping("/filtrar")
     public ResponseEntity<List<ProductResponse>> filtrarProductos(
-            @RequestParam(required = false) String nombre,
-            @RequestParam(required = false) String categoria,
-            @RequestParam(required = false) Double precioMax) {
+        @RequestParam(required = false) String nombre,
+        @RequestParam(required = false) Long categoriaId,
+        @RequestParam(required = false) String tipoCuero,
+        @RequestParam(required = false) String grosor,
+        @RequestParam(required = false) String acabado,
+        @RequestParam(required = false) String color,
+        @RequestParam(required = false) Double precioMin,
+        @RequestParam(required = false) Double precioMax) {
 
-        List<Producto> productosFiltrados = productService.filtrarProductos(nombre, categoria, precioMax);
+        List<Producto> productosFiltrados = productService.filtrarProductos(nombre, categoriaId, tipoCuero, grosor, 
+        acabado, color, precioMin, precioMax);
         List<ProductResponse> response = productosFiltrados.stream()
             .map(this::mapToProductResponse)
             .toList();

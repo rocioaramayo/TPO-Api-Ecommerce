@@ -2,6 +2,8 @@ package com.uade.tpo.tienda.dto;
 
 import java.time.LocalDateTime;
 import java.util.List;
+
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,4 +23,10 @@ public class ProductResponse {
     private List<PhotoResponse> fotos;
     private LocalDateTime createdAt;
     private boolean pocoStock;
+    private String tipoCuero;
+    private String grosor;
+    private String acabado;
+    private String color;
+    private String textura;
+    private String instruccionesCuidado;
 }

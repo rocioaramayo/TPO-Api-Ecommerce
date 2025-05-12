@@ -15,7 +15,10 @@ public interface ProductService {
   Producto updateStockProduct(Long id, Integer newStock);
   void deleteProduct(Long id);
   Producto getProductById(Long id);
-  List<Producto> filtrarProductos(String nombre, String categoria, Double precioMax);
+  List<Producto> filtrarProductos(String nombre, Long categoriaId, 
+  String tipoCuero, String grosor, 
+  String acabado, String color, 
+  Double precioMin, Double precioMax);
   Producto activarProducto(Long id) ;
   void validarImagenBase64(String contenidoBase64);
 
