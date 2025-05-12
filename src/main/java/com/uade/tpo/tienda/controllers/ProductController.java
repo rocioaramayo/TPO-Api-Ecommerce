@@ -24,6 +24,7 @@ import com.uade.tpo.tienda.entity.FotoProducto;
 import com.uade.tpo.tienda.entity.Producto;
 import com.uade.tpo.tienda.exceptions.ProductoSinImagenesException;
 import com.uade.tpo.tienda.service.category.CategoryService;
+import com.uade.tpo.tienda.service.favoritos.FavoritosService;
 import com.uade.tpo.tienda.service.product.ProductService;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -35,7 +36,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-
+import org.springframework.security.core.Authentication;
 
 @RestController
 @RequestMapping("productos")
@@ -44,7 +45,8 @@ public class ProductController {
     private ProductService productService;
     @Autowired
     private CategoryService categoryService;
-    
+    @Autowired
+    private FavoritosService favoritosService;
     // crear producto
     @PostMapping
     public ResponseEntity<ProductResponse> createProduct(@RequestBody ProductRequest request) {
@@ -242,5 +244,19 @@ public ResponseEntity<ProductPageResponse> getProducts(
 }
 
 
+@GetMapping("/{id}/es-favorito")
+public ResponseEntity<Boolean> verificarFavorito(
+        @PathVariable Long id,
+        Authentication authentication) {
+    
+    if (authentication == null) {
+        return ResponseEntity.ok(false);
+    }
+    
+    String email = authentication.getName();
+    boolean esFavorito = favoritosService.esFavorito(email, id);
+    
+    return ResponseEntity.ok(esFavorito);
+}
     
 }

@@ -74,7 +74,8 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.DELETE, "/productos/**").hasAuthority(Role.ADMIN.name())
                 .requestMatchers(HttpMethod.PUT,    "/productos/activar/**").hasAuthority(Role.ADMIN.name())
                 .requestMatchers(HttpMethod.PUT,    "/productos/stock/**").hasAuthority(Role.ADMIN.name())
-
+                // Reglas para favoritos
+                 .requestMatchers("/api/v1/favoritos/**").authenticated()
                 //   h) Resto de rutas: autenticado
                 .anyRequest().authenticated()
             )
