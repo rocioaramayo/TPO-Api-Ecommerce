@@ -76,6 +76,16 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.PUT,    "/productos/stock/**").hasAuthority(Role.ADMIN.name())
                 // Reglas para favoritos
                  .requestMatchers("/api/v1/favoritos/**").authenticated()
+                   // Reglas para descuentos - solo ADMIN puede gestionar y ver todos los descuentos
+                .requestMatchers(HttpMethod.POST, "/descuentos").hasAuthority(Role.ADMIN.name())
+                .requestMatchers(HttpMethod.PUT, "/descuentos/**").hasAuthority(Role.ADMIN.name())
+                .requestMatchers(HttpMethod.DELETE, "/descuentos/**").hasAuthority(Role.ADMIN.name())
+                .requestMatchers(HttpMethod.GET, "/descuentos").hasAuthority(Role.ADMIN.name())
+                .requestMatchers(HttpMethod.GET, "/descuentos/**").hasAuthority(Role.ADMIN.name())
+                
+                // Solo la validación de descuentos es pública
+                .requestMatchers(HttpMethod.POST, "/descuentos/validar").permitAll()
+                
                 //   h) Resto de rutas: autenticado
                 .anyRequest().authenticated()
             )

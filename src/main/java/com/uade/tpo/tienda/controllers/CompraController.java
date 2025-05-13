@@ -35,69 +35,42 @@ public ResponseEntity<List<CompraResponse>> obtenerMisCompras(Authentication aut
     String email = authentication.getName();
     List<Compra> compras = compraService.obtenerComprasDeUsuario(email);
 
-    List<CompraResponse> response = compras.stream().map(compra -> {
-        List<CompraItemResponse> items = compra.getItems().stream().map(item ->
-            new CompraItemResponse(
-                item.getProducto().getNombre(),
-                item.getCantidad(),
-                item.getProducto().getPrecio(),
-                item.getCantidad() * item.getProducto().getPrecio()
-            )
-        ).toList();
-
-        double total = items.stream().mapToDouble(CompraItemResponse::getSubtotal).sum();
-
-        return new CompraResponse(
-            compra.getId(),
-            compra.getFecha(),
-            items,
-            total
-        );
-    }).toList();
+    List<CompraResponse> response = compras.stream()
+        .map(this::mapearACompraResponse) // ¡Usar el método existente!
+        .toList();
 
     return ResponseEntity.ok(response);
 }
+
 @GetMapping
 public ResponseEntity<List<CompraResponse>> obtenerTodasLasCompras() {
     List<Compra> compras = compraService.obtenerTodas();
 
-    List<CompraResponse> response = compras.stream().map(compra -> {
-        List<CompraItemResponse> items = compra.getItems().stream().map(item ->
-            new CompraItemResponse(
-                item.getProducto().getNombre(),
-                item.getCantidad(),
-                item.getProducto().getPrecio(),
-                item.getCantidad() * item.getProducto().getPrecio()
-            )
-        ).toList();
-
-        double total = items.stream().mapToDouble(CompraItemResponse::getSubtotal).sum();
-
-        return new CompraResponse(
-            compra.getId(),
-            compra.getFecha(),
-            items,
-            total
-        );
-    }).toList();
+    List<CompraResponse> response = compras.stream()
+        .map(this::mapearACompraResponse) // ¡Usar el método existente!
+        .toList();
 
     return ResponseEntity.ok(response);
 }
 
 private CompraResponse mapearACompraResponse(Compra compra) {
-    return new CompraResponse(
-        compra.getId(),
-        compra.getFecha(),
-        compra.getItems().stream()
+    return CompraResponse.builder()
+        .id(compra.getId())
+        .fecha(compra.getFecha())
+        .items(compra.getItems().stream()
         .map(item -> new CompraItemResponse(
             item.getProducto().getNombre(),
             item.getCantidad(),
-            item.getProducto().getPrecio(), // <- nuevo parámetro: precio unitario
-            item.getCantidad() * item.getProducto().getPrecio() // subtotal calculado
+            item.getProducto().getPrecio(),
+            item.getCantidad() * item.getProducto().getPrecio()
         ))
-            .toList(),
-        compra.getTotal()
-    );
+            .toList())
+        .subtotal(compra.getSubtotal())
+        .codigoDescuento(compra.getCodigoDescuento())
+        .porcentajeDescuento(compra.getPorcentajeDescuento())
+        .montoDescuento(compra.getMontoDescuento())
+        .total(compra.getTotal())
+        .build();
 }
 
  }

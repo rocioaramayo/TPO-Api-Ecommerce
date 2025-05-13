@@ -7,4 +7,5 @@ import lombok.Data;
 @Data
 public class CompraRequest {
     private List<CompraItemRequest> items;
+    private String codigoDescuento;
 }
