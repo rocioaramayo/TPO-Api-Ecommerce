@@ -58,17 +58,28 @@ private CompraResponse mapearACompraResponse(Compra compra) {
         .id(compra.getId())
         .fecha(compra.getFecha())
         .items(compra.getItems().stream()
-        .map(item -> new CompraItemResponse(
-            item.getProducto().getNombre(),
-            item.getCantidad(),
-            item.getProducto().getPrecio(),
-            item.getCantidad() * item.getProducto().getPrecio()
-        ))
+            .map(item -> new CompraItemResponse(
+                item.getProducto().getNombre(),
+                item.getCantidad(),
+                item.getProducto().getPrecio(),
+                item.getCantidad() * item.getProducto().getPrecio()
+            ))
             .toList())
+        // Campos existentes para descuentos
         .subtotal(compra.getSubtotal())
         .codigoDescuento(compra.getCodigoDescuento())
         .porcentajeDescuento(compra.getPorcentajeDescuento())
         .montoDescuento(compra.getMontoDescuento())
+        // Nuevos campos para métodos de entrega
+        .metodoEntrega(compra.getMetodoEntrega() != null ? compra.getMetodoEntrega().getNombre() : null)
+        .puntoRetiro(compra.getPuntoRetiro() != null ? compra.getPuntoRetiro().getNombre() : null)
+        .direccionEntrega(compra.getDireccionEntrega())
+        .localidadEntrega(compra.getLocalidadEntrega())
+        .provinciaEntrega(compra.getProvinciaEntrega())
+        .codigoPostalEntrega(compra.getCodigoPostalEntrega())
+        .telefonoContacto(compra.getTelefonoContacto())
+        .costoEnvio(compra.getCostoEnvio())
+        // Total final
         .total(compra.getTotal())
         .build();
 }

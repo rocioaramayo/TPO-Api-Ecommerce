@@ -19,4 +19,12 @@ public class CompraResponse {
     private Double porcentajeDescuento;
     private Double montoDescuento;
     private Double total; 
+    private String metodoEntrega;
+    private String puntoRetiro;
+    private String direccionEntrega;
+    private String localidadEntrega;
+    private String provinciaEntrega;
+    private String codigoPostalEntrega;
+    private String telefonoContacto;
+    private Double costoEnvio;
 }

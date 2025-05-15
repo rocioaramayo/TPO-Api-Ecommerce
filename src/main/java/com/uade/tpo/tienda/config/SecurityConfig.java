@@ -85,6 +85,21 @@ public class SecurityConfig {
                 
                 // Solo la validación de descuentos es pública
                 .requestMatchers(HttpMethod.POST, "/descuentos/validar").permitAll()
+
+
+                // Reglas para métodos de entrega - solo ADMIN puede gestionar
+                .requestMatchers(HttpMethod.POST, "/entregas/metodos").hasAuthority(Role.ADMIN.name())
+                .requestMatchers(HttpMethod.PUT, "/entregas/metodos/**").hasAuthority(Role.ADMIN.name())
+                .requestMatchers(HttpMethod.DELETE, "/entregas/metodos/**").hasAuthority(Role.ADMIN.name())
+                
+                // Reglas para puntos de retiro - solo ADMIN puede gestionar
+                .requestMatchers(HttpMethod.POST, "/entregas/puntos").hasAuthority(Role.ADMIN.name())
+                .requestMatchers(HttpMethod.PUT, "/entregas/puntos/**").hasAuthority(Role.ADMIN.name())
+                .requestMatchers(HttpMethod.DELETE, "/entregas/puntos/**").hasAuthority(Role.ADMIN.name())
+                
+                // Consulta de métodos y puntos - público
+                .requestMatchers(HttpMethod.GET, "/entregas/metodos/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/entregas/puntos/**").permitAll()
                 
                 //   h) Resto de rutas: autenticado
                 .anyRequest().authenticated()
