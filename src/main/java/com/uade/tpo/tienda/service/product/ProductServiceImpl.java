@@ -6,9 +6,13 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+// Imports adicionales para ProductController.java
 
+// Imports adicionales para ProductServiceImpl.java
+import java.util.Comparator;
 
 import com.uade.tpo.tienda.entity.Producto;
 import com.uade.tpo.tienda.exceptions.FaltanDatosException;
@@ -154,13 +158,19 @@ public Producto getProductById(Long id) {
     return producto;
 }
 @Override
-public List<Producto> filtrarProductos(String nombre, Long categoriaId, 
-String tipoCuero, String grosor, 
-String acabado, String color, 
-Double precioMin, Double precioMax) {
-    List<Producto> productos = productRepository.findAll();
-
- return productos.stream()
+public Page<Producto> filtrarProductosOrdenados(
+    String nombre, Long categoriaId, 
+    String tipoCuero, String grosor, 
+    String acabado, String color, 
+    Double precioMin, Double precioMax,
+    String ordenarPor, String orden,
+    Pageable pageable) {
+    
+    // Primero obtenemos todos los productos
+    List<Producto> todosProductos = productRepository.findAll();
+    
+    // Aplicamos los filtros
+    List<Producto> productosFiltrados = todosProductos.stream()
         .filter(p -> p.isActivo()) // Solo productos activos
         .filter(p -> p.getStock() > 0) // Solo productos con stock
         
@@ -200,8 +210,56 @@ Double precioMin, Double precioMax) {
         .filter(p -> precioMax == null || p.getPrecio() <= precioMax)
         
         .collect(Collectors.toList());
+    
+    // Aplicar ordenamiento
+    Comparator<Producto> comparator;
+    switch (ordenarPor.toLowerCase()) {
+        case "nombre":
+            comparator = Comparator.comparing(Producto::getNombre, String.CASE_INSENSITIVE_ORDER);
+            break;
+        case "precio":
+            comparator = Comparator.comparing(Producto::getPrecio);
+            break;
+        case "fecha":
+            comparator = Comparator.comparing(Producto::getCreatedAt);
+            break;
+        case "stock":
+            comparator = Comparator.comparing(Producto::getStock);
+            break;
+        default:
+            comparator = Comparator.comparing(Producto::getPrecio);
+    }
+    
+    // Invertir el orden si es descendente
+    if ("desc".equalsIgnoreCase(orden)) {
+        comparator = comparator.reversed();
+    }
+    
+    // Ordenar la lista
+    List<Producto> productosOrdenados = productosFiltrados.stream()
+            .sorted(comparator)
+            .collect(Collectors.toList());
+    
+    // Aplicar paginación
+    int start = (int) pageable.getOffset();
+    int end = Math.min((start + pageable.getPageSize()), productosOrdenados.size());
+    
+    // Si el inicio es mayor que el tamaño de la lista, ajustamos para evitar errores
+    if (start > productosOrdenados.size()) {
+        start = 0;
+        end = Math.min(pageable.getPageSize(), productosOrdenados.size());
+    }
+    
+    // Crear subconjunto paginado
+    List<Producto> contenidoPaginado = productosOrdenados.subList(start, end);
+    
+    // Crear objeto Page con metadatos de paginación
+    return new PageImpl<>(
+        contenidoPaginado, 
+        pageable, 
+        productosOrdenados.size()
+    );
 }
-
 @Override
 public Producto updateStockProduct(Long id, Integer newStock) {
   //Encuentro el produto por ID

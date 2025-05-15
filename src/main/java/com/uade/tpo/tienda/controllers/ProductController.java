@@ -224,25 +224,30 @@ public ResponseEntity<ProductPageResponse> getProducts(
         .build();
     }
 @GetMapping("/filtrar")
-    public ResponseEntity<List<ProductResponse>> filtrarProductos(
-        @RequestParam(required = false) String nombre,
-        @RequestParam(required = false) Long categoriaId,
-        @RequestParam(required = false) String tipoCuero,
-        @RequestParam(required = false) String grosor,
-        @RequestParam(required = false) String acabado,
-        @RequestParam(required = false) String color,
-        @RequestParam(required = false) Double precioMin,
-        @RequestParam(required = false) Double precioMax) {
-
-        List<Producto> productosFiltrados = productService.filtrarProductos(nombre, categoriaId, tipoCuero, grosor, 
-        acabado, color, precioMin, precioMax);
-        List<ProductResponse> response = productosFiltrados.stream()
-            .map(this::mapToProductResponse)
-            .toList();
-
-        return ResponseEntity.ok(response);
+public ResponseEntity<Page<ProductResponse>> filtrarProductos(
+    @RequestParam(required = false) String nombre,
+    @RequestParam(required = false) Long categoriaId,
+    @RequestParam(required = false) String tipoCuero,
+    @RequestParam(required = false) String grosor,
+    @RequestParam(required = false) String acabado,
+    @RequestParam(required = false) String color,
+    @RequestParam(required = false) Double precioMin,
+    @RequestParam(required = false) Double precioMax,
+    @RequestParam(required = false, defaultValue = "precio") String ordenarPor,
+    @RequestParam(required = false, defaultValue = "asc") String orden,
+    @RequestParam(required = false, defaultValue = "0") int page,
+    @RequestParam(required = false, defaultValue = "20") int size) {
+    
+    // Llamar al servicio con parámetros de ordenamiento
+    Page<Producto> productosPage = productService.filtrarProductosOrdenados(
+        nombre, categoriaId, tipoCuero, grosor, acabado, color, precioMin, precioMax,
+        ordenarPor, orden, PageRequest.of(page, size));
+    
+    // Mapear a DTOs
+    Page<ProductResponse> responsePage = productosPage.map(this::mapToProductResponse);
+    
+    return ResponseEntity.ok(responsePage);
 }
-
 
 @GetMapping("/{id}/es-favorito")
 public ResponseEntity<Boolean> verificarFavorito(
