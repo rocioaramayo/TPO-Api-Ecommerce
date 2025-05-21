@@ -11,7 +11,9 @@ import com.uade.tpo.tienda.dto.ReviewResponse;
 import com.uade.tpo.tienda.entity.Producto;
 import com.uade.tpo.tienda.entity.Review;
 import com.uade.tpo.tienda.entity.Usuario;
+import com.uade.tpo.tienda.exceptions.ProductoNoEncontradoException;
 import com.uade.tpo.tienda.exceptions.UsuarioNoAutorizadoException;
+import com.uade.tpo.tienda.exceptions.UsuarioNoEncontradoException;
 import com.uade.tpo.tienda.repository.CompraRepository;
 import com.uade.tpo.tienda.repository.ProductRepository;
 import com.uade.tpo.tienda.repository.ReviewRepository;
@@ -35,15 +37,15 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     public void dejarReview(String email, ReviewRequest request) {
         Usuario usuario = usuarioRepository.findByEmail(email)
-            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+            .orElseThrow(() -> new UsuarioNoEncontradoException());
 
         Producto producto = productRepository.findById(request.getProductoId())
-            .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+            .orElseThrow(() -> new ProductoNoEncontradoException());
 
-            boolean compro = compraRepository.existsByUsuarioAndItemsProducto(usuario, producto);
-            if (!compro) {
-                throw new UsuarioNoAutorizadoException();
-            }
+        boolean compro = compraRepository.existsByUsuarioAndItemsProducto(usuario, producto);
+        if (!compro) {
+            throw new UsuarioNoAutorizadoException();
+        }
 
             
 
@@ -61,7 +63,7 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     public List<ReviewResponse> obtenerReviewsPorProducto(Long productoId) {
         Producto producto = productRepository.findById(productoId)
-            .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+            .orElseThrow(() -> new ProductoNoEncontradoException());
 
         return reviewRepository.findByProducto(producto).stream().map(r ->
             ReviewResponse.builder()

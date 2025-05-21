@@ -60,7 +60,7 @@ public class CompraService implements InterfazCompraService {
         // 1. Obtener usuario autenticado
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Usuario usuario = usuarioRepository.findByEmail(email)
-            .orElseThrow(UsuarioNoEncontradoException::new);
+            .orElseThrow(() -> new UsuarioNoEncontradoException());
         if (!usuario.isActivo()) {
             throw new UsuarioInactivoException();
         }
@@ -69,6 +69,8 @@ public class CompraService implements InterfazCompraService {
         Compra compra = new Compra();
         compra.setFecha(LocalDateTime.now());
         compra.setUsuario(usuario);
+        compra.setMetodoDePago(request.getMetodoDePago());
+        compra.setCuotas(request.getCuotas());
         compra = compraRepository.save(compra);
 
         // 3. Procesar ítems y calcular subtotal
@@ -76,7 +78,7 @@ public class CompraService implements InterfazCompraService {
         double subtotal = 0;
         for (CompraItemRequest itemReq : request.getItems()) {
             Producto producto = productoRepository.findById(itemReq.getProductoId())
-                .orElseThrow(ProductoNoEncontradoException::new);
+                .orElseThrow(() -> new ProductoNoEncontradoException());
             if (!producto.isActivo()) {
                 throw new ProductoInactivoException();
             }

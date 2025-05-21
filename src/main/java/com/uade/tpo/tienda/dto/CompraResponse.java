@@ -3,6 +3,8 @@ package com.uade.tpo.tienda.dto;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.uade.tpo.tienda.enums.MetodoDePago;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -27,4 +29,6 @@ public class CompraResponse {
     private String codigoPostalEntrega;
     private String telefonoContacto;
     private Double costoEnvio;
+    private MetodoDePago metodoDePago;
+    private int cuotas;
 }

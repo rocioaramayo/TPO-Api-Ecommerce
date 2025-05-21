@@ -6,6 +6,8 @@ package com.uade.tpo.tienda.entity;
  import java.time.LocalDateTime;
  import java.util.List;
  
+ import com.uade.tpo.tienda.enums.MetodoDePago;
+ 
  @Entity
  @Data
  @NoArgsConstructor
@@ -63,4 +65,7 @@ package com.uade.tpo.tienda.entity;
 
    @Column(name = "costo_envio")
    private Double costoEnvio;
+   
+   private MetodoDePago metodoDePago;
+   private int cuotas;
     }

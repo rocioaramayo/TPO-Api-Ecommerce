@@ -81,6 +81,8 @@ private CompraResponse mapearACompraResponse(Compra compra) {
         .costoEnvio(compra.getCostoEnvio())
         // Total final
         .total(compra.getTotal())
+        .metodoDePago(compra.getMetodoDePago())
+        .cuotas(compra.getCuotas())
         .build();
 }
 
