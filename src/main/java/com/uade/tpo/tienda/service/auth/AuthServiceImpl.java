@@ -7,6 +7,7 @@ import com.uade.tpo.tienda.dto.LoginResponse;
 import com.uade.tpo.tienda.dto.RegisterRequest;
 import com.uade.tpo.tienda.entity.Usuario;
 import com.uade.tpo.tienda.enums.Role;
+import com.uade.tpo.tienda.exceptions.EmailInvalidoException;
 import com.uade.tpo.tienda.exceptions.UsuarioInactivoException;
 import com.uade.tpo.tienda.exceptions.UsuarioNoEncontradoException;
 import com.uade.tpo.tienda.exceptions.UsuarioYaExisteException;
@@ -38,6 +39,10 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public LoginResponse login(LoginRequest request) {
+        if(!EmailValidator.esEmailValido(request.getEmail())){
+            throw new EmailInvalidoException();
+        }
+        
         Usuario user = usuarioRepository.findByEmail(request.getEmail())
             .orElseThrow(UsuarioNoEncontradoException::new);
     
@@ -63,6 +68,10 @@ public class AuthServiceImpl implements AuthService {
     
     @Override
 public AuthenticationResponse register(RegisterRequest request) {
+    if(!EmailValidator.esEmailValido(request.getEmail())){
+        throw new EmailInvalidoException();
+    }
+
     if (usuarioRepository.findByEmail(request.getEmail()).isPresent()) {
         throw new UsuarioYaExisteException();
     }
