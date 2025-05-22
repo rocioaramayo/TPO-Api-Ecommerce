@@ -15,7 +15,9 @@ import com.uade.tpo.tienda.dto.CompraRequest;
 import com.uade.tpo.tienda.dto.CompraResponse;
 import com.uade.tpo.tienda.entity.Compra;
  
- 
+ import org.springframework.web.bind.annotation.CrossOrigin;
+
+@CrossOrigin(origins = "http://localhost:5173")
  @RestController
 
  @RequestMapping("/compras")

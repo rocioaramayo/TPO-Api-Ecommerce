@@ -13,7 +13,9 @@ import com.uade.tpo.tienda.dto.UsuarioResponse;
 import com.uade.tpo.tienda.entity.Usuario;
 import com.uade.tpo.tienda.service.Usuario.UserService;
 
+import org.springframework.web.bind.annotation.CrossOrigin;
 
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/api/v1/users")
 public class UserController {
