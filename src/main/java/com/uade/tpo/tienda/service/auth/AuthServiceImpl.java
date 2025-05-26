@@ -61,6 +61,7 @@ public class AuthServiceImpl implements AuthService {
     
         return LoginResponse.builder()
             .token(jwt)
+            .role(user.getRole().name())
             .build();
     }
     
