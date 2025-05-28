@@ -1,43 +1,39 @@
+// Agregar estos imports al principio de ProductController.java:
+
 package com.uade.tpo.tienda.controllers;
 
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-
-import java.net.URI;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
+// Imports existentes...
 import com.uade.tpo.tienda.dto.PhotoResponse;
+import com.uade.tpo.tienda.dto.ProductDTO;
 import com.uade.tpo.tienda.dto.ProductPageResponse;
-import com.uade.tpo.tienda.dto.ProductRequest;
 import com.uade.tpo.tienda.dto.ProductResponse;
 import com.uade.tpo.tienda.dto.StockRequest;
 import com.uade.tpo.tienda.entity.Categoria;
 import com.uade.tpo.tienda.entity.FotoProducto;
 import com.uade.tpo.tienda.entity.Producto;
-import com.uade.tpo.tienda.exceptions.ProductoSinImagenesException;
+
+import com.uade.tpo.tienda.service.product.ProductService;
 import com.uade.tpo.tienda.service.category.CategoryService;
 import com.uade.tpo.tienda.service.favoritos.FavoritosService;
-import com.uade.tpo.tienda.service.product.ProductService;
 
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-
-import org.springframework.web.bind.annotation.RequestBody;
-
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+
 
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
@@ -49,136 +45,156 @@ public class ProductController {
     private CategoryService categoryService;
     @Autowired
     private FavoritosService favoritosService;
-    // crear producto
-    @PostMapping
-    public ResponseEntity<ProductResponse> createProduct(@RequestBody ProductRequest request) {
-        //validar que la categoría existe
-        Optional<Categoria> categoryOpt = categoryService.getCategoryById(request.getCategoryId());
-        if (!categoryOpt.isPresent()) {
-            return ResponseEntity.badRequest().build();
+    
+    // CREAR PRODUCTO - Exactamente como la profesora
+    @PostMapping("/upload")
+    public ResponseEntity<String> uploadProductWithImages(@ModelAttribute ProductDTO productDTO,
+        @RequestParam("files") MultipartFile[] files) {
+        try {
+            // Validar que la categoría existe
+            Optional<Categoria> categoryOpt = categoryService.getCategoryById(productDTO.getCategoryId());
+            if (!categoryOpt.isPresent()) {
+                return new ResponseEntity<>("Categoría no encontrada", HttpStatus.BAD_REQUEST);
+            }
+            
+            // Crear producto
+            Producto producto = new Producto();
+            producto.setNombre(productDTO.getNombre());
+            producto.setDescripcion(productDTO.getDescripcion());
+            producto.setPrecio(productDTO.getPrecio());
+            producto.setStock(productDTO.getStock());
+            producto.setCategoria(categoryOpt.get());
+            producto.setTipoCuero(productDTO.getTipoCuero());
+            producto.setGrosor(productDTO.getGrosor());
+            producto.setAcabado(productDTO.getAcabado());
+            producto.setColor(productDTO.getColor());
+            producto.setTextura(productDTO.getTextura());
+            producto.setInstruccionesCuidado(productDTO.getInstruccionesCuidado());
+            producto.setActivo(true);
+
+            // Procesar archivos de imagen - EXACTAMENTE como la profesora
+            List<FotoProducto> fotos = new ArrayList<>();
+            for (MultipartFile file : files) {
+                if (!file.isEmpty()) {
+                    byte[] bytes = file.getBytes();
+                    javax.sql.rowset.serial.SerialBlob blob = new javax.sql.rowset.serial.SerialBlob(bytes);
+                    
+                    FotoProducto foto = FotoProducto.builder()
+                            .image(blob)
+                            .producto(producto)
+                            .build();
+                    fotos.add(foto);
+                }
+            }
+            
+            producto.setFotos(fotos);
+            productService.saveProductWithImages(producto);
+            
+            return new ResponseEntity<>("Producto subido exitosamente", HttpStatus.OK);
+        } catch (IOException | SQLException e) {
+            return new ResponseEntity<>("Error al subir producto: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        Categoria categoria = categoryOpt.get();
-        
-        
-        // transformar la lista de PhotoRequest en entidad FotoProducto
-        // transformar la lista de PhotoRequest en entidad FotoProducto
-        List<FotoProducto> fotos = null;
-        if (request.getFotos() != null && !request.getFotos().isEmpty()) {
-            fotos = request.getFotos().stream().map(photoReq ->
-                FotoProducto.builder()
-                    .contenidoBase64(photoReq.getContenidoBase64())
-                    .tipoContenido(photoReq.getTipoContenido())
-                    .descripcion(photoReq.getDescripcion())
-                    .build()
-            ).collect(Collectors.toList());
-        } else {
-            throw new ProductoSinImagenesException();
-        }
-        // construir Producto 
-        Producto producto = Producto.builder()
-                .nombre(request.getNombre())
-                .descripcion(request.getDescripcion())
-                .precio(request.getPrecio())
-                .stock(request.getStock())
-                .categoria(categoria)
-                .fotos(fotos)   
-                .tipoCuero(request.getTipoCuero())
-                .grosor(request.getGrosor())
-                .acabado(request.getAcabado()) 
-                .color(request.getColor())
-                .textura(request.getTextura())
-                .instruccionesCuidado(request.getInstruccionesCuidado())
-                .build();
+    }
+
+    // ACTUALIZAR PRODUCTO - Nuevo método que funciona con el sistema actual
+    @PutMapping("/{id}")
+    public ResponseEntity<String> updateProductWithImages(
+            @PathVariable Long id,
+            @ModelAttribute ProductDTO productDTO,
+            @RequestParam(value = "files", required = false) MultipartFile[] files) {
+        try {
+            // Validar que la categoría existe
+            Optional<Categoria> categoryOpt = categoryService.getCategoryById(productDTO.getCategoryId());
+            if (!categoryOpt.isPresent()) {
+                return new ResponseEntity<>("Categoría no encontrada", HttpStatus.BAD_REQUEST);
+            }
+            
+            // Buscar producto existente
+            Producto productoExistente = productService.getProductById(id);
+            
+            // Actualizar campos básicos
+            productoExistente.setNombre(productDTO.getNombre());
+            productoExistente.setDescripcion(productDTO.getDescripcion());
+            productoExistente.setPrecio(productDTO.getPrecio());
+            productoExistente.setStock(productDTO.getStock());
+            productoExistente.setCategoria(categoryOpt.get());
+            productoExistente.setTipoCuero(productDTO.getTipoCuero());
+            productoExistente.setGrosor(productDTO.getGrosor());
+            productoExistente.setAcabado(productDTO.getAcabado());
+            productoExistente.setColor(productDTO.getColor());
+            productoExistente.setTextura(productDTO.getTextura());
+            productoExistente.setInstruccionesCuidado(productDTO.getInstruccionesCuidado());
+
+            // Si se envían nuevas imágenes, reemplazar las existentes
+            if (files != null && files.length > 0) {
+                // Limpiar imágenes existentes
+                productoExistente.getFotos().clear();
                 
-        // 5. Persistir el producto 
-        Producto created = productService.createProduct(producto);
-        // 6. Mapear el producto creado a un DTO de salida
-        ProductResponse response = mapToProductResponse(created);
-        return ResponseEntity.created(URI.create("/productos/" + created.getId())).body(response);
-        
+                // Procesar nuevas imágenes
+                List<FotoProducto> nuevasFotos = new ArrayList<>();
+                for (MultipartFile file : files) {
+                    if (!file.isEmpty()) {
+                        byte[] bytes = file.getBytes();
+                        javax.sql.rowset.serial.SerialBlob blob = new javax.sql.rowset.serial.SerialBlob(bytes);
+                        
+                        FotoProducto foto = FotoProducto.builder()
+                                .image(blob)
+                                .producto(productoExistente)
+                                .build();
+                        nuevasFotos.add(foto);
+                    }
+                }
+                productoExistente.setFotos(nuevasFotos);
+            }
+            // Si no se envían archivos, mantener las imágenes existentes
+            
+            // Actualizar producto
+            productService.updateProductWithImages(productoExistente);
+            
+            return new ResponseEntity<>("Producto actualizado exitosamente", HttpStatus.OK);
+            
+        } catch (IOException | SQLException e) {
+            return new ResponseEntity<>("Error al actualizar producto: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping("/detalle/{id}")
     public ResponseEntity<ProductResponse> getProductDetail(@PathVariable Long id) {
         Producto producto = productService.getProductById(id);
-    
         return ResponseEntity.ok(mapToProductResponse(producto));
     }
 
-    // listar productos
     @GetMapping
-public ResponseEntity<ProductPageResponse> getProducts(
-    @RequestParam(required = false) Integer page,
-    @RequestParam(required = false) Integer size) {
+    public ResponseEntity<ProductPageResponse> getProducts(
+        @RequestParam(required = false) Integer page,
+        @RequestParam(required = false) Integer size) {
 
-    Page<Producto> productos;
-    if (page == null || size == null) {
-        productos = productService.getProducts(PageRequest.of(0, Integer.MAX_VALUE));
-    } else {
-        productos = productService.getProducts(PageRequest.of(page, size));
+        Page<Producto> productos;
+        if (page == null || size == null) {
+            productos = productService.getProducts(PageRequest.of(0, Integer.MAX_VALUE));
+        } else {
+            productos = productService.getProducts(PageRequest.of(page, size));
+        }
+
+        List<ProductResponse> responseList = productos
+            .stream()
+            .map(this::mapToProductResponse)
+            .toList();
+
+        ProductPageResponse response = ProductPageResponse.builder()
+            .productos(responseList)
+            .totalProductos(productos.getTotalElements())
+            .paginaActual(productos.getNumber())
+            .tamañoPagina(productos.getSize())
+            .build();
+
+        return ResponseEntity.ok(response);
     }
-
-    List<ProductResponse> responseList = productos
-        .stream()
-        .map(this::mapToProductResponse)
-        .toList();
-
-    ProductPageResponse response = ProductPageResponse.builder()
-        .productos(responseList)
-        .totalProductos(productos.getTotalElements())
-        .paginaActual(productos.getNumber())
-        .tamañoPagina(productos.getSize())
-        .build();
-
-    return ResponseEntity.ok(response);
-}
-
     
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id){
         productService.deleteProduct(id);
         return ResponseEntity.noContent().build();
-
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<Producto> updateProduct(@PathVariable Long id, @RequestBody ProductRequest request) {
-        Optional<Categoria> categoriaOpt = categoryService.getCategoryById(request.getCategoryId());
-        if (!categoriaOpt.isPresent()) {
-            return ResponseEntity.badRequest().build();
-        }
-    
-        Categoria categoria = categoriaOpt.get();
-    
-        // Procesar las fotos con Base64
-        List<FotoProducto> fotos = null;
-        if (request.getFotos() != null && !request.getFotos().isEmpty()) {
-            fotos = request.getFotos().stream().map(photoReq ->
-                FotoProducto.builder()
-                    .contenidoBase64(photoReq.getContenidoBase64())
-                    .tipoContenido(photoReq.getTipoContenido())
-                    .descripcion(photoReq.getDescripcion())
-                    .build()
-            ).collect(Collectors.toList());
-        }
-    
-        Producto producto = Producto.builder()
-            .nombre(request.getNombre())
-            .descripcion(request.getDescripcion())
-            .precio(request.getPrecio())
-            .stock(request.getStock())
-            .categoria(categoria)
-            .fotos(fotos)
-            .tipoCuero(request.getTipoCuero())
-            .grosor(request.getGrosor())
-            .acabado(request.getAcabado())
-            .color(request.getColor())
-            .textura(request.getTextura())
-            .instruccionesCuidado(request.getInstruccionesCuidado())
-            .build();
-    
-        Producto updated = productService.updateProduct(id, producto);
-        return ResponseEntity.ok(updated);
     }
     
     @PutMapping("/activar/{id}")
@@ -186,84 +202,88 @@ public ResponseEntity<ProductPageResponse> getProducts(
         Producto activado = productService.activarProducto(id);
         return ResponseEntity.ok(activado);
     }
+    
     @PutMapping("stock/{id}")
     public ResponseEntity<Producto> updateStockProduct (@PathVariable Long id, @RequestBody StockRequest stockRequest) {
         Producto updated = productService.updateStockProduct(id, stockRequest.getStock());
         return ResponseEntity.ok(updated);
     }
 
+    // MÉTODO HELPER - Convierte Blob a Base64 para mostrar en frontend
     private ProductResponse mapToProductResponse(Producto producto) {
-        // Mapear las fotos
         List<PhotoResponse> photoResponses = null;
         if (producto.getFotos() != null) {
             photoResponses = producto.getFotos().stream()
-                .map(foto -> PhotoResponse.builder()
-                    .id(foto.getId())
-                    .contenidoBase64(foto.getContenidoBase64())
-                    .tipoContenido(foto.getTipoContenido())
-                    .descripcion(foto.getDescripcion())
-                    .build())
+                .map(foto -> {
+                    try {
+                        String encodedString = Base64.getEncoder()
+                            .encodeToString(foto.getImage().getBytes(1, (int) foto.getImage().length()));
+                        return PhotoResponse.builder()
+                            .id(foto.getId())
+                            .file(encodedString)
+                            .build();
+                    } catch (SQLException e) {
+                        throw new RuntimeException("Error procesando imagen", e);
+                    }
+                })
                 .collect(Collectors.toList());
         }
         
         return ProductResponse.builder()
-        .id(producto.getId())
-        .nombre(producto.getNombre())
-        .descripcion(producto.getDescripcion())
-        .precio(producto.getPrecio())
-        .stock(producto.getStock())
-        .categoria(producto.getCategoria().getNombre())  
-        .fotos(photoResponses)
-        .createdAt(producto.getCreatedAt())
-        .pocoStock(producto.getStock() < 5)
-        // Nuevos campos
-        .tipoCuero(producto.getTipoCuero())
-        .grosor(producto.getGrosor())
-        .acabado(producto.getAcabado())
-        .color(producto.getColor())
-        .textura(producto.getTextura())
-        .instruccionesCuidado(producto.getInstruccionesCuidado())
-        .build();
+            .id(producto.getId())
+            .nombre(producto.getNombre())
+            .descripcion(producto.getDescripcion())
+            .precio(producto.getPrecio())
+            .stock(producto.getStock())
+            .categoria(producto.getCategoria().getNombre())  
+            .fotos(photoResponses)
+            .createdAt(producto.getCreatedAt())
+            .pocoStock(producto.getStock() < 5)
+            .tipoCuero(producto.getTipoCuero())
+            .grosor(producto.getGrosor())
+            .acabado(producto.getAcabado())
+            .color(producto.getColor())
+            .textura(producto.getTextura())
+            .instruccionesCuidado(producto.getInstruccionesCuidado())
+            .build();
     }
-@GetMapping("/filtrar")
-public ResponseEntity<Page<ProductResponse>> filtrarProductos(
-    @RequestParam(required = false) String nombre,
-    @RequestParam(required = false) Long categoriaId,
-    @RequestParam(required = false) String tipoCuero,
-    @RequestParam(required = false) String grosor,
-    @RequestParam(required = false) String acabado,
-    @RequestParam(required = false) String color,
-    @RequestParam(required = false) Double precioMin,
-    @RequestParam(required = false) Double precioMax,
-    @RequestParam(required = false, defaultValue = "precio") String ordenarPor,
-    @RequestParam(required = false, defaultValue = "asc") String orden,
-    @RequestParam(required = false, defaultValue = "0") int page,
-    @RequestParam(required = false, defaultValue = "20") int size) {
-    
-    // Llamar al servicio con parámetros de ordenamiento
-    Page<Producto> productosPage = productService.filtrarProductosOrdenados(
-        nombre, categoriaId, tipoCuero, grosor, acabado, color, precioMin, precioMax,
-        ordenarPor, orden, PageRequest.of(page, size));
-    
-    // Mapear a DTOs
-    Page<ProductResponse> responsePage = productosPage.map(this::mapToProductResponse);
-    
-    return ResponseEntity.ok(responsePage);
-}
 
-@GetMapping("/{id}/es-favorito")
-public ResponseEntity<Boolean> verificarFavorito(
-        @PathVariable Long id,
-        Authentication authentication) {
-    
-    if (authentication == null) {
-        return ResponseEntity.ok(false);
+    @GetMapping("/filtrar")
+    public ResponseEntity<Page<ProductResponse>> filtrarProductos(
+        @RequestParam(required = false) String nombre,
+        @RequestParam(required = false) Long categoriaId,
+        @RequestParam(required = false) String tipoCuero,
+        @RequestParam(required = false) String grosor,
+        @RequestParam(required = false) String acabado,
+        @RequestParam(required = false) String color,
+        @RequestParam(required = false) Double precioMin,
+        @RequestParam(required = false) Double precioMax,
+        @RequestParam(required = false, defaultValue = "precio") String ordenarPor,
+        @RequestParam(required = false, defaultValue = "asc") String orden,
+        @RequestParam(required = false, defaultValue = "0") int page,
+        @RequestParam(required = false, defaultValue = "20") int size) {
+        
+        Page<Producto> productosPage = productService.filtrarProductosOrdenados(
+            nombre, categoriaId, tipoCuero, grosor, acabado, color, precioMin, precioMax,
+            ordenarPor, orden, PageRequest.of(page, size));
+        
+        Page<ProductResponse> responsePage = productosPage.map(this::mapToProductResponse);
+        
+        return ResponseEntity.ok(responsePage);
     }
-    
-    String email = authentication.getName();
-    boolean esFavorito = favoritosService.esFavorito(email, id);
-    
-    return ResponseEntity.ok(esFavorito);
-}
-    
+
+    @GetMapping("/{id}/es-favorito")
+    public ResponseEntity<Boolean> verificarFavorito(
+            @PathVariable Long id,
+            Authentication authentication) {
+        
+        if (authentication == null) {
+            return ResponseEntity.ok(false);
+        }
+        
+        String email = authentication.getName();
+        boolean esFavorito = favoritosService.esFavorito(email, id);
+        
+        return ResponseEntity.ok(esFavorito);
+    }
 }

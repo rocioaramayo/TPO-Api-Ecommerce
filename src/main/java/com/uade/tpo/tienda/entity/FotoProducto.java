@@ -1,6 +1,7 @@
 package com.uade.tpo.tienda.entity;
 
 import java.time.LocalDateTime;
+import java.sql.Blob;
 
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -12,7 +13,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -26,7 +26,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @Entity
 @Table(name = "fotos_producto")
-
 public class FotoProducto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,16 +36,8 @@ public class FotoProducto {
     @JsonBackReference
     private Producto producto;
 
-    // Almacenar el contenido Base64 de la imagen
-    @Lob
-    @Column(nullable = false, columnDefinition = "LONGTEXT")
-    private String contenidoBase64;
-    
-    // Guardar el tipo de contenido (MIME type)
-    @Column(nullable = false)
-    private String tipoContenido; // e.g., "image/jpeg", "image/png"
-    
-    private String descripcion;
+    // SOLO ESTE CAMPO - exactamente como la profesora
+    private Blob image;
 
     @CreationTimestamp
     @Column(name = "created_at")

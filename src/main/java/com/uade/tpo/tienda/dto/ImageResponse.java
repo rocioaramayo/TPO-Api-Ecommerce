@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PhotoResponse {
+public class ImageResponse {
     private Long id;
-    private String file; // Base64 string para mostrar en frontend - IGUAL que ImageResponse
+    private String file;
 }

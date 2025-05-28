@@ -2,6 +2,8 @@ package com.uade.tpo.tienda.config;
 
 import com.uade.tpo.tienda.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.boot.autoconfigure.web.servlet.MultipartProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -12,6 +14,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.multipart.support.StandardServletMultipartResolver;
 
 @Configuration
 @RequiredArgsConstructor
@@ -41,5 +44,10 @@ public class ApplicationConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+    
+    @Bean
+    public StandardServletMultipartResolver multipartResolver(MultipartProperties multipartProperties) {
+        return new StandardServletMultipartResolver();
     }
 }

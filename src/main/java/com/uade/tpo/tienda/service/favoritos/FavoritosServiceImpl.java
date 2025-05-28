@@ -17,7 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -123,7 +125,6 @@ public class FavoritosServiceImpl implements FavoritosService {
         return favoritosRepository.existsByUsuarioAndProducto(usuarioOpt.get(), productoOpt.get());
     }
     
-    
     private FavoritoResponse mapToFavoritoResponse(ListaFavoritos favorito) {
         // Usamos el service de productos para mapear correctamente el producto
         Producto producto = favorito.getProducto();
@@ -154,19 +155,25 @@ public class FavoritosServiceImpl implements FavoritosService {
                 .build();
     }
     
-    
+    // MÉTODO CORREGIDO para trabajar con Blob
     private List<PhotoResponse> mapearFotos(Producto producto) {
         if (producto.getFotos() == null || producto.getFotos().isEmpty()) {
             return List.of();
         }
         
         return producto.getFotos().stream()
-            .map(foto -> PhotoResponse.builder()
-                    .id(foto.getId())
-                    .contenidoBase64(foto.getContenidoBase64())
-                    .tipoContenido(foto.getTipoContenido())
-                    .descripcion(foto.getDescripcion())
-                    .build())
+            .map(foto -> {
+                try {
+                    String encodedString = Base64.getEncoder()
+                        .encodeToString(foto.getImage().getBytes(1, (int) foto.getImage().length()));
+                    return PhotoResponse.builder()
+                        .id(foto.getId())
+                        .file(encodedString)
+                        .build();
+                } catch (SQLException e) {
+                    throw new RuntimeException("Error procesando imagen", e);
+                }
+            })
             .collect(Collectors.toList());
     }
 }

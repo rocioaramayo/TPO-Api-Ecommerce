@@ -4,20 +4,20 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
-
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductRequest {
+public class ProductRequestWithFiles {
     private String nombre;
     private String descripcion;
     private Double precio;
     private Integer stock;
-    private Long categoryId;  // ID de la categoría a la que pertenece el producto
-    private List<PhotoRequest> fotos;// Lista de fotos a asociar al productos
+    private Long categoryId;
+    private List<MultipartFile> imagenes; // Cambio: usar MultipartFile
     private String tipoCuero;
     private String grosor;
     private String acabado;

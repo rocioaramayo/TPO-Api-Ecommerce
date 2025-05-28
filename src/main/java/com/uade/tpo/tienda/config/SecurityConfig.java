@@ -77,6 +77,10 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.DELETE, "/productos/**").hasAuthority(Role.ADMIN.name())
                 .requestMatchers(HttpMethod.PUT,    "/productos/activar/**").hasAuthority(Role.ADMIN.name())
                 .requestMatchers(HttpMethod.PUT,    "/productos/stock/**").hasAuthority(Role.ADMIN.name())
+                //   h) IMÁGENES - SOLO ADMIN
+                .requestMatchers(HttpMethod.GET, "/images/**").hasAuthority(Role.ADMIN.name())
+                .requestMatchers(HttpMethod.POST, "/images/**").hasAuthority(Role.ADMIN.name())
+                
                 // Reglas para favoritos
                  .requestMatchers("/api/v1/favoritos/**").authenticated()
                    // Reglas para descuentos - solo ADMIN puede gestionar y ver todos los descuentos
