@@ -95,4 +95,10 @@ public class EntregaController {
         entregaService.eliminarPuntoRetiro(id);
         return ResponseEntity.noContent().build();
     }
+    // Endpoint para cotizar envío según dirección/código postal
+    @PostMapping("/cotizar")
+    public ResponseEntity<CotizacionEnvioResponse> cotizarEnvio(@RequestBody CotizacionEnvioRequest request) {
+        CotizacionEnvioResponse response = entregaService.cotizarEnvio(request);
+        return ResponseEntity.ok(response);
+    }
 }

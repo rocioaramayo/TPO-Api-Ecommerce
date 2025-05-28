@@ -22,4 +22,5 @@ public interface EntregaService {
     List<PuntoRetiroResponse> obtenerPuntosRetiroActivos();
     List<PuntoRetiroResponse> obtenerPuntosRetiroPorMetodo(Long metodoEntregaId);
     PuntoRetiroResponse obtenerPuntoRetiroPorId(Long id);
+    CotizacionEnvioResponse cotizarEnvio(CotizacionEnvioRequest request);
 }

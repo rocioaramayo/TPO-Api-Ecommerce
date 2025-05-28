@@ -1,7 +1,7 @@
-
 package com.uade.tpo.tienda.service.entrega;
 
 import com.uade.tpo.tienda.dto.*;
+import com.uade.tpo.tienda.dto.CotizacionEnvioResponse;
 import com.uade.tpo.tienda.entity.MetodoEntrega;
 import com.uade.tpo.tienda.entity.PuntoRetiro;
 import com.uade.tpo.tienda.exceptions.RecursoNoEncontradoException;
@@ -237,5 +237,23 @@ public class EntregaServiceImpl implements EntregaService {
                 .metodoEntregaId(puntoRetiro.getMetodoEntrega() != null ? puntoRetiro.getMetodoEntrega().getId() : null)
                 .activo(puntoRetiro.isActivo())
                 .build();
+    }
+    @Override
+    public CotizacionEnvioResponse cotizarEnvio(CotizacionEnvioRequest request) {
+        // Lógica de ejemplo por código postal
+        double precio;
+        String codigoPostal = request.getCodigoPostal();
+        if (codigoPostal == null) {
+            precio = 0.0;
+        } else if (codigoPostal.startsWith("14")) { // CABA
+            precio = 1200.0;
+        } else if (codigoPostal.startsWith("16") || codigoPostal.startsWith("17") || codigoPostal.startsWith("18")) { // GBA ejemplo
+            precio = 1800.0;
+        } else if (codigoPostal.startsWith("5")) { // Córdoba
+            precio = 2100.0;
+        } else {
+            precio = 3200.0; // Resto del país
+        }
+        return new CotizacionEnvioResponse(precio);
     }
 }
