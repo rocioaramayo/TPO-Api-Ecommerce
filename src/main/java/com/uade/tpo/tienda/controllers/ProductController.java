@@ -1,5 +1,3 @@
-// Agregar estos imports al principio de ProductController.java:
-
 package com.uade.tpo.tienda.controllers;
 
 // Imports existentes...
@@ -70,7 +68,7 @@ public class ProductController {
             producto.setColor(productDTO.getColor());
             producto.setTextura(productDTO.getTextura());
             producto.setInstruccionesCuidado(productDTO.getInstruccionesCuidado());
-            producto.setActivo(true);
+            producto.setActivo(productDTO.getActivo() != null ? productDTO.getActivo() : true);
 
             // Procesar archivos de imagen - EXACTAMENTE como la profesora
             List<FotoProducto> fotos = new ArrayList<>();
@@ -124,6 +122,8 @@ public class ProductController {
             productoExistente.setColor(productDTO.getColor());
             productoExistente.setTextura(productDTO.getTextura());
             productoExistente.setInstruccionesCuidado(productDTO.getInstruccionesCuidado());
+            boolean activo = productDTO.getActivo() == null ? true : productDTO.getActivo();
+            productoExistente.setActivo(activo);
 
             // Si se envían nuevas imágenes, reemplazar las existentes
             if (files != null && files.length > 0) {
@@ -198,9 +198,9 @@ public class ProductController {
     }
     
     @PutMapping("/activar/{id}")
-    public ResponseEntity<Producto> activarProducto(@PathVariable Long id) {
+    public ResponseEntity<ProductResponse> activarProducto(@PathVariable Long id) {
         Producto activado = productService.activarProducto(id);
-        return ResponseEntity.ok(activado);
+        return ResponseEntity.ok(mapToProductResponse(activado));
     }
     
     @PutMapping("stock/{id}")

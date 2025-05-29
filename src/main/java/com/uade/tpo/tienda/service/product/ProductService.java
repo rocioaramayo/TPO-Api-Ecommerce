@@ -9,7 +9,10 @@ import org.springframework.data.domain.Pageable;
 
 public interface ProductService {
   Page<Producto> getProducts(Pageable pageable);
-Producto updateProductWithImages(Producto producto);
+  
+ 
+  Producto updateProductWithImages(Producto producto);
+  
   Producto updateStockProduct(Long id, Integer newStock);
   void deleteProduct(Long id);
   Producto getProductById(Long id);
@@ -21,6 +24,7 @@ Producto updateProductWithImages(Producto producto);
   String ordenarPor, String orden,
   Pageable pageable) ;
   Producto activarProducto(Long id) ;
+  
   Producto saveProductWithImages(Producto producto) throws IOException;
 
 }

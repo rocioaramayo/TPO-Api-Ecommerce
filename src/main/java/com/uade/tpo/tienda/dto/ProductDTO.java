@@ -15,4 +15,5 @@ public class ProductDTO {
     private String color;
     private String textura;
     private String instruccionesCuidado;
+    private Boolean activo;
 }

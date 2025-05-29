@@ -63,6 +63,18 @@ public class Producto {
     private LocalDateTime createdAt;
     @Column
     private boolean activo;
+
+    public boolean getActivo() {
+        return activo;
+    }
+
+    public boolean isActivo() {
+        return activo;
+    }
+
+    public void setActivo(boolean activo) {
+        this.activo = activo;
+    }
 //atributos expecificos
     @Column(name = "tipo_cuero")
     private String tipoCuero; // "Plena flor", "Nobuck", "Anilina", etc.

@@ -45,9 +45,8 @@ public class ProductServiceImpl implements ProductService{
         // Setear referencia bidireccional a las fotos
         producto.getFotos().forEach(foto -> foto.setProducto(producto));
 
-        // Activarlo por defecto
-        producto.setActivo(true);
-
+        // Respetar el valor de activo recibido
+        producto.setActivo(producto.getActivo());
         return productRepository.save(producto);
     }
 
@@ -56,11 +55,6 @@ public class ProductServiceImpl implements ProductService{
         // Validar que el producto existe
         if (producto.getId() == null) {
             throw new ProductoNoEncontradoException();
-        }
-        
-        // Verificar que el producto está activo
-        if (!producto.isActivo()) {
-            throw new ProductoInactivoException();
         }
         
         // Validar campos obligatorios
