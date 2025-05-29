@@ -3,17 +3,22 @@ package com.uade.tpo.tienda.controllers;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
 
 import com.uade.tpo.tienda.dto.UsuarioResponse;
 import com.uade.tpo.tienda.entity.Usuario;
 import com.uade.tpo.tienda.service.Usuario.UserService;
+import org.springframework.security.core.context.SecurityContextHolder;
 
-import org.springframework.web.bind.annotation.CrossOrigin;
+import io.jsonwebtoken.Jwt;
 
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
@@ -34,13 +39,14 @@ public class UserController {
         return ResponseEntity.ok(userService.getUserById(id));
     }
 
-   
+
     @GetMapping("/me")
     public ResponseEntity<UsuarioResponse> me(@AuthenticationPrincipal Usuario usuario) {
         return ResponseEntity.ok(userService.getMyProfile(usuario.getEmail()));
     }
 
-   
+
+
     @PutMapping("/{id}/habilitar")
     public ResponseEntity<Map<String, String>> habilitar(@PathVariable Long id) {
         String mensaje = userService.habilitarUsuario(id);
