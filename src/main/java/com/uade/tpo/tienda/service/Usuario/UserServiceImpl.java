@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.uade.tpo.tienda.dto.UsuarioResponse;
+import com.uade.tpo.tienda.dto.UsuarioUpdateRequest;
 import com.uade.tpo.tienda.entity.Usuario;
 import com.uade.tpo.tienda.exceptions.UsuarioNoEncontradoException;
 import com.uade.tpo.tienda.repository.UsuarioRepository;
@@ -70,6 +71,18 @@ public class UserServiceImpl implements UserService {
         usuarioRepository.save(user);
         return "Usuario " + user.getLoginName() + " deshabilitado exitosamente.";
     }
+
+    @Override
+@Transactional
+public UsuarioResponse updateMyProfile(Usuario usuario, UsuarioUpdateRequest req) {
+    // Actualiza solo los campos permitidos
+    usuario.setFirstName(req.getFirstName());
+    usuario.setLastName(req.getLastName());
+    usuarioRepository.save(usuario);
+    return mapToResponse(usuario);
+}
+
+
 
     private UsuarioResponse mapToResponse(Usuario u) {
         return new UsuarioResponse(
