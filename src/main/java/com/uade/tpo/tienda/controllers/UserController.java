@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 import com.uade.tpo.tienda.dto.UsuarioResponse;
+import com.uade.tpo.tienda.dto.UsuarioUpdateRequest;
 import com.uade.tpo.tienda.entity.Usuario;
 import com.uade.tpo.tienda.service.Usuario.UserService;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -54,6 +55,16 @@ public class UserController {
         response.put("mensaje", mensaje);
         return ResponseEntity.ok(response);
     }
+
+@PutMapping("/me")
+public ResponseEntity<UsuarioResponse> updateProfile(
+    @AuthenticationPrincipal Usuario usuario,
+    @RequestBody UsuarioUpdateRequest req
+) {
+    UsuarioResponse updated = userService.updateMyProfile(usuario, req);
+    return ResponseEntity.ok(updated);
+}
+
 
     @PutMapping("/{id}/deshabilitar")
     public ResponseEntity<Map<String, String>> deshabilitar(@PathVariable Long id) {
