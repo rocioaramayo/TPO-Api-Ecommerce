@@ -23,4 +23,7 @@ public interface EntregaService {
     List<PuntoRetiroResponse> obtenerPuntosRetiroPorMetodo(Long metodoEntregaId);
     PuntoRetiroResponse obtenerPuntoRetiroPorId(Long id);
     CotizacionEnvioResponse cotizarEnvio(CotizacionEnvioRequest request);
+    void guardarMetodoDelUsuario(String email, Long metodoEntregaId);
+    List<MetodoEntregaResponse> obtenerMetodosDelUsuario(String email);
+
 }

@@ -99,6 +99,11 @@ public class SecurityConfig {
                 
                 // Cotizar envíos - acceso autenticado
                 .requestMatchers(HttpMethod.POST, "/entregas/cotizar").authenticated()
+
+                // Métodos de entrega guardados por el usuario
+                .requestMatchers(HttpMethod.GET, "/entregas/metodos/usuario").authenticated()
+                .requestMatchers(HttpMethod.POST, "/entregas/metodos/usuario").authenticated()
+
                 
                 // Consulta de métodos y puntos - público
                 .requestMatchers(HttpMethod.GET, "/entregas/metodos/**").permitAll()
