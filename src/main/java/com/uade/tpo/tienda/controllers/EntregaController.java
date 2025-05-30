@@ -6,6 +6,9 @@ import com.uade.tpo.tienda.service.entrega.EntregaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
+
+
 
 import java.net.URI;
 import java.util.List;
@@ -26,6 +29,17 @@ public class EntregaController {
         MetodoEntregaResponse response = entregaService.crearMetodoEntrega(request);
         return ResponseEntity.created(URI.create("/entregas/metodos/" + response.getId())).body(response);
     }
+
+    @PostMapping("/metodos/usuario")
+public ResponseEntity<Void> guardarMetodoDelUsuario(
+        @RequestBody MetodoUsuarioRequest request,
+        Authentication authentication) {
+
+    String email = authentication.getName();
+    entregaService.guardarMetodoDelUsuario(email, request.getMetodoEntregaId());
+    return ResponseEntity.ok().build();
+}
+
     
     @GetMapping("/metodos")
     public ResponseEntity<List<MetodoEntregaResponse>> obtenerMetodosEntrega() {
