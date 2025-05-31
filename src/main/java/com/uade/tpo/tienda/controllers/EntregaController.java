@@ -12,7 +12,6 @@ import org.springframework.security.core.Authentication;
 
 import java.net.URI;
 import java.util.List;
-import org.springframework.web.bind.annotation.CrossOrigin;
 
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
@@ -39,6 +38,13 @@ public ResponseEntity<Void> guardarMetodoDelUsuario(
     entregaService.guardarMetodoDelUsuario(email, request.getMetodoEntregaId());
     return ResponseEntity.ok().build();
 }
+
+@GetMapping("/usuario/metodos")
+public ResponseEntity<List<MetodoEntregaResponse>> obtenerMetodosDelUsuario(Authentication authentication) {
+    String email = authentication.getName();
+    return ResponseEntity.ok(entregaService.obtenerMetodosDelUsuario(email));
+}
+
 
     
     @GetMapping("/metodos")
