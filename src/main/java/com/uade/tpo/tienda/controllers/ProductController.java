@@ -157,7 +157,33 @@ public class ProductController {
             return new ResponseEntity<>("Error al actualizar producto: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    // NUEVO ENDPOINT SOLO PARA ADMIN
+    @GetMapping("/admin")
+    public ResponseEntity<ProductPageResponse> getProductsForAdmin(
+        @RequestParam(required = false) Integer page,
+        @RequestParam(required = false) Integer size) {
 
+        Page<Producto> productos;
+        if (page == null || size == null) {
+            productos = productService.getAllProductsForAdmin(PageRequest.of(0, Integer.MAX_VALUE));
+        } else {
+            productos = productService.getAllProductsForAdmin(PageRequest.of(page, size));
+        }
+
+        List<ProductResponse> responseList = productos
+            .stream()
+            .map(this::mapToProductResponseForAdmin)
+            .toList();
+
+        ProductPageResponse response = ProductPageResponse.builder()
+            .productos(responseList)
+            .totalProductos(productos.getTotalElements())
+            .paginaActual(productos.getNumber())
+            .tamañoPagina(productos.getSize())
+            .build();
+
+        return ResponseEntity.ok(response);
+    }
     @GetMapping("/detalle/{id}")
     public ResponseEntity<ProductResponse> getProductDetail(@PathVariable Long id) {
         Producto producto = productService.getProductById(id);
@@ -286,4 +312,45 @@ public class ProductController {
         
         return ResponseEntity.ok(esFavorito);
     }
+
+    // MÉTODO HELPER PARA ADMIN - Incluye información adicional como estado activo/inactivo
+    private ProductResponse mapToProductResponseForAdmin(Producto producto) {
+        List<PhotoResponse> photoResponses = null;
+        if (producto.getFotos() != null) {
+            photoResponses = producto.getFotos().stream()
+                .map(foto -> {
+                    try {
+                        String encodedString = Base64.getEncoder()
+                            .encodeToString(foto.getImage().getBytes(1, (int) foto.getImage().length()));
+                        return PhotoResponse.builder()
+                            .id(foto.getId())
+                            .file(encodedString)
+                            .build();
+                    } catch (SQLException e) {
+                        throw new RuntimeException("Error procesando imagen", e);
+                    }
+                })
+                .collect(Collectors.toList());
+        }
+        
+        return ProductResponse.builder()
+            .id(producto.getId())
+            .nombre(producto.getNombre())
+            .descripcion(producto.getDescripcion())
+            .precio(producto.getPrecio())
+            .stock(producto.getStock())
+            .categoria(producto.getCategoria().getNombre())  
+            .fotos(photoResponses)
+            .createdAt(producto.getCreatedAt())
+            .pocoStock(producto.getStock() < 5)
+            .tipoCuero(producto.getTipoCuero())
+            .grosor(producto.getGrosor())
+            .acabado(producto.getAcabado())
+            .color(producto.getColor())
+            .textura(producto.getTextura())
+            .instruccionesCuidado(producto.getInstruccionesCuidado())
+            .activo(producto.isActivo()) // Información adicional para admin
+            .build();
+    }
+
 }

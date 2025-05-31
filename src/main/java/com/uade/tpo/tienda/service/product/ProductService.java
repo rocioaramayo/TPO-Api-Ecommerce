@@ -9,7 +9,9 @@ import org.springframework.data.domain.Pageable;
 
 public interface ProductService {
   Page<Producto> getProducts(Pageable pageable);
-  
+  // Nuevo método para admin - obtiene todos los productos (activos e inactivos y bajo stock)
+  Page<Producto> getAllProductsForAdmin(Pageable pageable);
+ 
  
   Producto updateProductWithImages(Producto producto);
   

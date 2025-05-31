@@ -49,7 +49,11 @@ public class ProductServiceImpl implements ProductService{
         producto.setActivo(producto.getActivo());
         return productRepository.save(producto);
     }
-
+ @Override
+    public Page<Producto> getAllProductsForAdmin(Pageable pageable) {
+        // Para admin: devuelve TODOS los productos (activos e inactivos)
+        return productRepository.findAll(pageable);
+    }
     @Override
     public Producto updateProductWithImages(Producto producto) {
         // Validar que el producto existe
