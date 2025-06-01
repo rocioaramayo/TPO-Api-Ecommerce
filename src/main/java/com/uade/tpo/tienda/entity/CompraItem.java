@@ -4,13 +4,17 @@ package com.uade.tpo.tienda.entity;
  import lombok.AllArgsConstructor;
  import lombok.Builder;
  import lombok.Data;
- import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
  @Entity
  @Table(name = "compra_item")
  @Data
  @NoArgsConstructor
  @AllArgsConstructor
  @Builder
+ @Getter
+ @Setter
  public class CompraItem {
  
      @Id
@@ -25,4 +29,6 @@ package com.uade.tpo.tienda.entity;
      @ManyToOne
      @JoinColumn(name = "compra_id")
      private Compra compra;
+    
+
     }

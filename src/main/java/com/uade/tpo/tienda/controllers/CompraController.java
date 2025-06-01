@@ -2,9 +2,11 @@ package com.uade.tpo.tienda.controllers;
  
  import java.util.List;
  import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.beans.factory.annotation.Autowired;
  import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
  import org.springframework.web.bind.annotation.RequestBody;
  import org.springframework.web.bind.annotation.RequestMapping;
@@ -54,6 +56,13 @@ public ResponseEntity<List<CompraResponse>> obtenerTodasLasCompras() {
 
     return ResponseEntity.ok(response);
 }
+
+@GetMapping("/{id}")
+    public ResponseEntity<CompraResponse> obtenerDetalleCompra(@PathVariable Long id) {
+        String emailUsuario = SecurityContextHolder.getContext().getAuthentication().getName();
+        CompraResponse response = compraService.obtenerCompraDelUsuario(id, emailUsuario);
+        return ResponseEntity.ok(response);
+    }
 
 private CompraResponse mapearACompraResponse(Compra compra) {
     return CompraResponse.builder()

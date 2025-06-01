@@ -10,7 +10,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.uade.tpo.tienda.dto.CompraItemRequest;
+import com.uade.tpo.tienda.dto.CompraItemResponse;
 import com.uade.tpo.tienda.dto.CompraRequest;
+import com.uade.tpo.tienda.dto.CompraResponse;
 import com.uade.tpo.tienda.dto.DescuentoAplicadoResponse;
 import com.uade.tpo.tienda.dto.ValidarDescuentoRequest;
 import com.uade.tpo.tienda.entity.Compra;
@@ -149,6 +151,7 @@ public class CompraService implements InterfazCompraService {
             }
         }
 
+
         // 6. Asignar datos de entrega en la compra
         compra.setMetodoEntrega(metodoEntrega);
         compra.setPuntoRetiro(puntoRetiro);
@@ -183,4 +186,44 @@ public class CompraService implements InterfazCompraService {
     public List<Compra> obtenerTodas() {
         return compraRepository.findAll();
     }
+
+
+
+@Override
+    public CompraResponse obtenerCompraDelUsuario(Long idCompra, String emailUsuario) {
+        Compra compra = compraRepository.findById(idCompra)
+            .orElseThrow(() -> new RuntimeException("Compra no encontrada"));
+
+        if (!compra.getUsuario().getEmail().equals(emailUsuario)) {
+            throw new RuntimeException("No tienes acceso a esta compra");
+        }
+
+        return mapearAResponse(compra);
+    }
+
+private CompraResponse mapearAResponse(Compra compra) {
+    List<CompraItemResponse> items = compra.getItems().stream().map(item -> {
+        double precio = item.getProducto().getPrecio(); // usamos el precio actual del producto
+
+        return CompraItemResponse.builder()
+            .nombreProducto(item.getProducto().getNombre())
+            .cantidad(item.getCantidad())
+            .precioUnitario(precio)
+            .build();
+    }).toList();
+
+    return CompraResponse.builder()
+        .id(compra.getId())
+        .fecha(compra.getFecha())
+        .items(items)
+        .subtotal(compra.getSubtotal())
+        .total(compra.getTotal())
+        .build();
+}
+
+
+
+
+
+
 }
