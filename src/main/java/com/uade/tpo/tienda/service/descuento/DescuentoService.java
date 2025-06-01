@@ -10,7 +10,6 @@ public interface DescuentoService {
     DescuentoResponse actualizarDescuento(Long id, DescuentoRequest request);
     MessageResponse eliminarDescuento(Long id);
     List<DescuentoResponse> obtenerTodosDescuentos();
-    DescuentoResponse obtenerDescuentoPorId(Long id);
     DescuentoResponse cambiarEstadoDescuento(Long id, boolean activo);
     DescuentoAplicadoResponse validarDescuento(ValidarDescuentoRequest request);
 }

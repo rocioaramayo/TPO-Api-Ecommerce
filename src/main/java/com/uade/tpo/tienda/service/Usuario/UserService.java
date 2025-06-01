@@ -8,7 +8,6 @@ import com.uade.tpo.tienda.entity.Usuario;
 
 public interface UserService {
     List<UsuarioResponse> listAllUsers();
-    UsuarioResponse getUserById(Long id);
     UsuarioResponse getMyProfile(String email);
     String habilitarUsuario(Long id);
     String deshabilitarUsuario(Long id);

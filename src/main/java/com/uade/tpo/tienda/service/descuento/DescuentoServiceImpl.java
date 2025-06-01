@@ -129,13 +129,7 @@ public class DescuentoServiceImpl implements DescuentoService {
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public DescuentoResponse obtenerDescuentoPorId(Long id) {
-        Descuento descuento = descuentoRepository.findById(id)
-                .orElseThrow(() -> new RecursoNoEncontradoException("Descuento no encontrado con ID: " + id));
-        
-        return mapToDescuentoResponse(descuento);
-    }
+
 
     @Override
     @Transactional

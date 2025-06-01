@@ -33,12 +33,6 @@ public class UserServiceImpl implements UserService {
             .collect(Collectors.toList());
     }
 
-    @Override
-    public UsuarioResponse getUserById(Long id) {
-        Usuario user = usuarioRepository.findById(id)
-            .orElseThrow(UsuarioNoEncontradoException::new);
-        return mapToResponse(user);
-    }
 
     @Override
     public UsuarioResponse getMyProfile(String email) {

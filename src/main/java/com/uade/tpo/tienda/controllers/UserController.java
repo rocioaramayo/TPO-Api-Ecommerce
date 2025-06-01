@@ -30,14 +30,6 @@ public class UserController {
         return ResponseEntity.ok(userService.listAllUsers());
     }
 
-
-    @GetMapping("/{id}")
-
-    public ResponseEntity<UsuarioResponse> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(userService.getUserById(id));
-    }
-
-
     @GetMapping("/me")
     public ResponseEntity<UsuarioResponse> me(@AuthenticationPrincipal Usuario usuario) {
         return ResponseEntity.ok(userService.getMyProfile(usuario.getEmail()));

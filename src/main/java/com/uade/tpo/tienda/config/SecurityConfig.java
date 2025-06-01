@@ -72,10 +72,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.PUT,    "/productos/activar/**").hasAuthority(Role.ADMIN.name())
                 .requestMatchers(HttpMethod.PUT,    "/productos/stock/**").hasAuthority(Role.ADMIN.name())
                 .requestMatchers(HttpMethod.GET, "/productos/admin/**").hasAuthority(Role.ADMIN.name())
-                // h) IMÁGENES - SOLO ADMIN
-                .requestMatchers(HttpMethod.GET, "/images/**").hasAuthority(Role.ADMIN.name())
-                .requestMatchers(HttpMethod.POST, "/images/**").hasAuthority(Role.ADMIN.name())
-                
+            
                 // Favoritos
                 .requestMatchers("/api/v1/favoritos/**").authenticated()
 
