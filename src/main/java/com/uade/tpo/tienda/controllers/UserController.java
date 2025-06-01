@@ -12,9 +12,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 import org.springframework.web.bind.annotation.*;
 
-import com.uade.tpo.tienda.dto.AddressHistoryResponse;
-import com.uade.tpo.tienda.dto.PaymentHistoryResponse;
-import com.uade.tpo.tienda.dto.ShippingHistoryResponse;
 import com.uade.tpo.tienda.dto.UsuarioResponse;
 import com.uade.tpo.tienda.dto.UsuarioUpdateRequest;
 import com.uade.tpo.tienda.entity.Usuario;
@@ -74,25 +71,5 @@ public ResponseEntity<UsuarioResponse> updateProfile(
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/me/payment-history")
-    public ResponseEntity<List<PaymentHistoryResponse>> getMyPaymentHistory(
-            @AuthenticationPrincipal Usuario usuario) {
-        List<PaymentHistoryResponse> history = userService.getPaymentHistory(usuario.getEmail());
-        return ResponseEntity.ok(history);
-    }
-
-    @GetMapping("/me/addresses-history") 
-    public ResponseEntity<List<AddressHistoryResponse>> getMyAddressHistory(
-            @AuthenticationPrincipal Usuario usuario) {
-        List<AddressHistoryResponse> addresses = userService.getAddressHistory(usuario.getEmail());
-        return ResponseEntity.ok(addresses);
-    }
-
-    @GetMapping("/me/shipping-history")
-    public ResponseEntity<List<ShippingHistoryResponse>> getMyShippingHistory(
-            @AuthenticationPrincipal Usuario usuario) {
-        List<ShippingHistoryResponse> shipping = userService.getShippingHistory(usuario.getEmail());
-        return ResponseEntity.ok(shipping);
-    }
 
 }

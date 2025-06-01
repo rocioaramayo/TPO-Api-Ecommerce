@@ -58,10 +58,6 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/v1/users/me").authenticated()
                 .requestMatchers(HttpMethod.PUT, "/api/v1/users/me").authenticated()
 
-                // e.1) Historial de usuario - solo usuarios autenticados
-                .requestMatchers(HttpMethod.GET, "/api/v1/users/me/payment-history").authenticated()
-                .requestMatchers(HttpMethod.GET, "/api/v1/users/me/addresses-history").authenticated()
-                .requestMatchers(HttpMethod.GET, "/api/v1/users/me/shipping-history").authenticated()
 
                 .requestMatchers("/api/v1/users/**").hasAuthority(Role.ADMIN.name())
 
