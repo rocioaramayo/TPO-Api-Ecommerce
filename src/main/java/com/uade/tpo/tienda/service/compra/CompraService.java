@@ -203,12 +203,14 @@ public class CompraService implements InterfazCompraService {
 
 private CompraResponse mapearAResponse(Compra compra) {
     List<CompraItemResponse> items = compra.getItems().stream().map(item -> {
-        double precio = item.getProducto().getPrecio(); // usamos el precio actual del producto
+        double precio = item.getProducto().getPrecio();
+        double subtotal = item.getCantidad() * precio;
 
         return CompraItemResponse.builder()
             .nombreProducto(item.getProducto().getNombre())
             .cantidad(item.getCantidad())
             .precioUnitario(precio)
+            .subtotal(subtotal)
             .build();
     }).toList();
 
@@ -217,9 +219,27 @@ private CompraResponse mapearAResponse(Compra compra) {
         .fecha(compra.getFecha())
         .items(items)
         .subtotal(compra.getSubtotal())
+        .codigoDescuento(compra.getCodigoDescuento())
+        .porcentajeDescuento(compra.getPorcentajeDescuento())
+        .montoDescuento(compra.getMontoDescuento())
         .total(compra.getTotal())
+
+        .metodoEntrega(compra.getMetodoEntrega() != null ? compra.getMetodoEntrega().getNombre() : null)
+
+        .puntoRetiro(compra.getPuntoRetiro() != null ? compra.getPuntoRetiro().getNombre() : null)
+        .direccionEntrega(compra.getDireccionEntrega())
+        .localidadEntrega(compra.getLocalidadEntrega())
+        .provinciaEntrega(compra.getProvinciaEntrega())
+        .codigoPostalEntrega(compra.getCodigoPostalEntrega())
+        .telefonoContacto(compra.getTelefonoContacto())
+        .costoEnvio(compra.getCostoEnvio())
+        .metodoDePago(compra.getMetodoDePago())
+        .cuotas(compra.getCuotas())
+
         .build();
 }
+
+
 
 
 
