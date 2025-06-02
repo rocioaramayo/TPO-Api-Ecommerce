@@ -70,20 +70,4 @@ public ResponseEntity<UsuarioResponse> updateProfile(
         response.put("mensaje", mensaje);
         return ResponseEntity.ok(response);
     }
-
-    @GetMapping("/admin/compras")
-@PreAuthorize("hasRole('ADMIN')")
-public ResponseEntity<List<CompraAdminResponse>> listarTodasLasCompras() {
-    List<Compra> compras = compraService.obtenerTodas();
-    List<CompraAdminResponse> respuestas = compras.stream()
-        .map(compraService::mapearACompraAdminResponse)
-        .toList();
-    return ResponseEntity.ok(respuestas);
-}
-
-
-
-    
-
-
 }

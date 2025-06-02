@@ -1,7 +1,9 @@
 package com.uade.tpo.tienda.controllers;
  
  import java.util.List;
- import org.springframework.security.core.Authentication;
+
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.beans.factory.annotation.Autowired;
  import org.springframework.http.ResponseEntity;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
  import org.springframework.web.bind.annotation.RequestMapping;
  import org.springframework.web.bind.annotation.RestController;
  import com.uade.tpo.tienda.service.compra.*;
+import com.uade.tpo.tienda.dto.CompraAdminResponse;
 import com.uade.tpo.tienda.dto.CompraItemResponse;
 import com.uade.tpo.tienda.dto.CompraRequest;
 import com.uade.tpo.tienda.dto.CompraResponse;
@@ -29,6 +32,10 @@ import com.uade.tpo.tienda.entity.Direccion;
  
     @Autowired
     private InterfazCompraService compraService;
+
+    @Autowired
+    private CompraService compraService2;
+
     
  @PostMapping
     public ResponseEntity<CompraResponse> realizarCompra(@RequestBody CompraRequest request) {
@@ -111,6 +118,16 @@ private CompraResponse mapearACompraResponse(Compra compra) {
         .metodoDePago(compra.getMetodoDePago())
         .cuotas(compra.getCuotas())
         .build();
+}
+
+@GetMapping("/admin/compras")
+@PreAuthorize("hasRole('ADMIN')")
+public ResponseEntity<List<CompraAdminResponse>> listarTodasLasCompras() {
+    List<Compra> compras = compraService2.obtenerTodas();
+    List<CompraAdminResponse> respuestas = compras.stream()
+        .map(compraService2::mapearACompraAdminResponse)
+        .toList();
+    return ResponseEntity.ok(respuestas);
 }
 
  }
