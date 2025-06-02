@@ -12,11 +12,8 @@ public class CompraRequest {
     private String codigoDescuento;
     private Long metodoEntregaId;
     private Long puntoRetiroId;
-    private String direccionEntrega;
-    private String localidadEntrega;
-    private String provinciaEntrega;
-    private String codigoPostalEntrega;
-    private String telefonoContacto;
+    // Reemplazamos los campos individuales de dirección por el ID de una dirección existente
+    private Long direccionId;
     private MetodoDePago metodoDePago;
     private int cuotas;
-    }
+}

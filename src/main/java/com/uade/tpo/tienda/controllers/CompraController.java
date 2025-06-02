@@ -15,7 +15,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import com.uade.tpo.tienda.dto.CompraItemResponse;
 import com.uade.tpo.tienda.dto.CompraRequest;
 import com.uade.tpo.tienda.dto.CompraResponse;
+import com.uade.tpo.tienda.dto.DireccionResponse;
 import com.uade.tpo.tienda.entity.Compra;
+import com.uade.tpo.tienda.entity.Direccion;
  
  import org.springframework.web.bind.annotation.CrossOrigin;
 
@@ -65,6 +67,23 @@ public ResponseEntity<List<CompraResponse>> obtenerTodasLasCompras() {
     }
 
 private CompraResponse mapearACompraResponse(Compra compra) {
+    // Mapear dirección si existe
+    DireccionResponse direccionResponse = null;
+    if (compra.getDireccionEntrega() != null) {
+        Direccion dir = compra.getDireccionEntrega();
+        direccionResponse = DireccionResponse.builder()
+            .id(dir.getId())
+            .calle(dir.getCalle())
+            .numero(dir.getNumero())
+            .piso(dir.getPiso())
+            .departamento(dir.getDepartamento())
+            .localidad(dir.getLocalidad())
+            .provincia(dir.getProvincia())
+            .codigoPostal(dir.getCodigoPostal())
+            .telefonoContacto(dir.getTelefonoContacto())
+            .build();
+    }
+
     return CompraResponse.builder()
         .id(compra.getId())
         .fecha(compra.getFecha())
@@ -81,14 +100,11 @@ private CompraResponse mapearACompraResponse(Compra compra) {
         .codigoDescuento(compra.getCodigoDescuento())
         .porcentajeDescuento(compra.getPorcentajeDescuento())
         .montoDescuento(compra.getMontoDescuento())
-        // Nuevos campos para métodos de entrega
+        // Campos para métodos de entrega
         .metodoEntrega(compra.getMetodoEntrega() != null ? compra.getMetodoEntrega().getNombre() : null)
         .puntoRetiro(compra.getPuntoRetiro() != null ? compra.getPuntoRetiro().getNombre() : null)
-        .direccionEntrega(compra.getDireccionEntrega())
-        .localidadEntrega(compra.getLocalidadEntrega())
-        .provinciaEntrega(compra.getProvinciaEntrega())
-        .codigoPostalEntrega(compra.getCodigoPostalEntrega())
-        .telefonoContacto(compra.getTelefonoContacto())
+        // Usar la nueva estructura de dirección
+        .direccionEntrega(direccionResponse)
         .costoEnvio(compra.getCostoEnvio())
         // Total final
         .total(compra.getTotal())

@@ -23,11 +23,8 @@ public class CompraResponse {
     private Double total; 
     private String metodoEntrega;
     private String puntoRetiro;
-    private String direccionEntrega;
-    private String localidadEntrega;
-    private String provinciaEntrega;
-    private String codigoPostalEntrega;
-    private String telefonoContacto;
+    // Información de dirección como objeto anidado
+    private DireccionResponse direccionEntrega;
     private Double costoEnvio;
     private MetodoDePago metodoDePago;
     private int cuotas;
