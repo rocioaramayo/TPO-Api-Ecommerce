@@ -1,19 +1,26 @@
 package com.uade.tpo.tienda.controllers;
  
  import java.util.List;
- import org.springframework.security.core.Authentication;
+
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.beans.factory.annotation.Autowired;
  import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
  import org.springframework.web.bind.annotation.RequestBody;
  import org.springframework.web.bind.annotation.RequestMapping;
  import org.springframework.web.bind.annotation.RestController;
  import com.uade.tpo.tienda.service.compra.*;
+import com.uade.tpo.tienda.dto.CompraAdminResponse;
 import com.uade.tpo.tienda.dto.CompraItemResponse;
 import com.uade.tpo.tienda.dto.CompraRequest;
 import com.uade.tpo.tienda.dto.CompraResponse;
+import com.uade.tpo.tienda.dto.DireccionResponse;
 import com.uade.tpo.tienda.entity.Compra;
+import com.uade.tpo.tienda.entity.Direccion;
  
  import org.springframework.web.bind.annotation.CrossOrigin;
 
@@ -25,6 +32,10 @@ import com.uade.tpo.tienda.entity.Compra;
  
     @Autowired
     private InterfazCompraService compraService;
+
+    @Autowired
+    private CompraService compraService2;
+
     
  @PostMapping
     public ResponseEntity<CompraResponse> realizarCompra(@RequestBody CompraRequest request) {
@@ -55,7 +66,31 @@ public ResponseEntity<List<CompraResponse>> obtenerTodasLasCompras() {
     return ResponseEntity.ok(response);
 }
 
+@GetMapping("/{id}")
+    public ResponseEntity<CompraResponse> obtenerDetalleCompra(@PathVariable Long id) {
+        String emailUsuario = SecurityContextHolder.getContext().getAuthentication().getName();
+        CompraResponse response = compraService.obtenerCompraDelUsuario(id, emailUsuario);
+        return ResponseEntity.ok(response);
+    }
+
 private CompraResponse mapearACompraResponse(Compra compra) {
+    // Mapear dirección si existe
+    DireccionResponse direccionResponse = null;
+    if (compra.getDireccionEntrega() != null) {
+        Direccion dir = compra.getDireccionEntrega();
+        direccionResponse = DireccionResponse.builder()
+            .id(dir.getId())
+            .calle(dir.getCalle())
+            .numero(dir.getNumero())
+            .piso(dir.getPiso())
+            .departamento(dir.getDepartamento())
+            .localidad(dir.getLocalidad())
+            .provincia(dir.getProvincia())
+            .codigoPostal(dir.getCodigoPostal())
+            .telefonoContacto(dir.getTelefonoContacto())
+            .build();
+    }
+
     return CompraResponse.builder()
         .id(compra.getId())
         .fecha(compra.getFecha())
@@ -72,20 +107,27 @@ private CompraResponse mapearACompraResponse(Compra compra) {
         .codigoDescuento(compra.getCodigoDescuento())
         .porcentajeDescuento(compra.getPorcentajeDescuento())
         .montoDescuento(compra.getMontoDescuento())
-        // Nuevos campos para métodos de entrega
+        // Campos para métodos de entrega
         .metodoEntrega(compra.getMetodoEntrega() != null ? compra.getMetodoEntrega().getNombre() : null)
         .puntoRetiro(compra.getPuntoRetiro() != null ? compra.getPuntoRetiro().getNombre() : null)
-        .direccionEntrega(compra.getDireccionEntrega())
-        .localidadEntrega(compra.getLocalidadEntrega())
-        .provinciaEntrega(compra.getProvinciaEntrega())
-        .codigoPostalEntrega(compra.getCodigoPostalEntrega())
-        .telefonoContacto(compra.getTelefonoContacto())
+        // Usar la nueva estructura de dirección
+        .direccionEntrega(direccionResponse)
         .costoEnvio(compra.getCostoEnvio())
         // Total final
         .total(compra.getTotal())
         .metodoDePago(compra.getMetodoDePago())
         .cuotas(compra.getCuotas())
         .build();
+}
+
+@GetMapping("/admin/compras")
+@PreAuthorize("hasRole('ADMIN')")
+public ResponseEntity<List<CompraAdminResponse>> listarTodasLasCompras() {
+    List<Compra> compras = compraService2.obtenerTodas();
+    List<CompraAdminResponse> respuestas = compras.stream()
+        .map(compraService2::mapearACompraAdminResponse)
+        .toList();
+    return ResponseEntity.ok(respuestas);
 }
 
  }

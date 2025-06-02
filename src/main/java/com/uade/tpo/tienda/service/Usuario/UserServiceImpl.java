@@ -1,17 +1,26 @@
 package com.uade.tpo.tienda.service.Usuario;
 
+
 import java.util.List;
+
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.uade.tpo.tienda.dto.CompraAdminResponse;
+import com.uade.tpo.tienda.dto.CompraItemResponse;
+import com.uade.tpo.tienda.dto.DireccionResponse;
 import com.uade.tpo.tienda.dto.UsuarioResponse;
 import com.uade.tpo.tienda.dto.UsuarioUpdateRequest;
+import com.uade.tpo.tienda.entity.Compra;
+import com.uade.tpo.tienda.entity.Direccion;
 import com.uade.tpo.tienda.entity.Usuario;
+
 import com.uade.tpo.tienda.exceptions.UsuarioNoEncontradoException;
 import com.uade.tpo.tienda.repository.UsuarioRepository;
+
 
 import lombok.RequiredArgsConstructor;
 
@@ -28,12 +37,6 @@ public class UserServiceImpl implements UserService {
             .collect(Collectors.toList());
     }
 
-    @Override
-    public UsuarioResponse getUserById(Long id) {
-        Usuario user = usuarioRepository.findById(id)
-            .orElseThrow(UsuarioNoEncontradoException::new);
-        return mapToResponse(user);
-    }
 
     @Override
     public UsuarioResponse getMyProfile(String email) {
@@ -96,4 +99,7 @@ public UsuarioResponse updateMyProfile(Usuario usuario, UsuarioUpdateRequest req
             u.getCreatedAT()
         );
     }
+
+
+
 }

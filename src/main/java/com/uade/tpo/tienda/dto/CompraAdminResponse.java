@@ -12,20 +12,22 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 @Builder
-public class CompraResponse {
+public class CompraAdminResponse {
     private Long id;
     private LocalDateTime fecha;
+    private String nombreUsuario;
+    private String emailUsuario;
     private List<CompraItemResponse> items;
     private Double subtotal;
     private String codigoDescuento;
     private Double porcentajeDescuento;
     private Double montoDescuento;
-    private Double total; 
     private String metodoEntrega;
     private String puntoRetiro;
-    // Información de dirección como objeto anidado
     private DireccionResponse direccionEntrega;
     private Double costoEnvio;
+    private Double total;
     private MetodoDePago metodoDePago;
     private int cuotas;
 }
+

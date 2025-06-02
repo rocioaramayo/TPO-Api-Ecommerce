@@ -31,11 +31,6 @@ public class DescuentoController {
         return ResponseEntity.ok(descuentoService.obtenerTodosDescuentos());
     }
     
-    @GetMapping("/{id}")
-    public ResponseEntity<DescuentoResponse> obtenerPorId(@PathVariable Long id) {
-        return ResponseEntity.ok(descuentoService.obtenerDescuentoPorId(id));
-    }
-    
     @PutMapping("/{id}")
     public ResponseEntity<DescuentoResponse> actualizarDescuento(
             @PathVariable Long id, 

@@ -1,4 +1,3 @@
-// src/main/java/com/uade/tpo/tienda/service/compra/CompraService.java
 package com.uade.tpo.tienda.service.compra;
 
 import java.time.LocalDateTime;
@@ -9,12 +8,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import com.uade.tpo.tienda.dto.CompraAdminResponse;
 import com.uade.tpo.tienda.dto.CompraItemRequest;
+import com.uade.tpo.tienda.dto.CompraItemResponse;
 import com.uade.tpo.tienda.dto.CompraRequest;
+import com.uade.tpo.tienda.dto.CompraResponse;
 import com.uade.tpo.tienda.dto.DescuentoAplicadoResponse;
+import com.uade.tpo.tienda.dto.DireccionResponse;
 import com.uade.tpo.tienda.dto.ValidarDescuentoRequest;
 import com.uade.tpo.tienda.entity.Compra;
 import com.uade.tpo.tienda.entity.CompraItem;
+import com.uade.tpo.tienda.entity.Direccion;
 import com.uade.tpo.tienda.entity.MetodoEntrega;
 import com.uade.tpo.tienda.entity.PuntoRetiro;
 import com.uade.tpo.tienda.entity.Producto;
@@ -26,6 +30,7 @@ import com.uade.tpo.tienda.exceptions.StockInsuficienteException;
 import com.uade.tpo.tienda.exceptions.UsuarioInactivoException;
 import com.uade.tpo.tienda.exceptions.UsuarioNoEncontradoException;
 import com.uade.tpo.tienda.repository.CompraRepository;
+import com.uade.tpo.tienda.repository.DireccionRepository;
 import com.uade.tpo.tienda.repository.MetodoEntregaRepository;
 import com.uade.tpo.tienda.repository.ProductRepository;
 import com.uade.tpo.tienda.repository.PuntoRetiroRepository;
@@ -45,6 +50,9 @@ public class CompraService implements InterfazCompraService {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private DireccionRepository direccionRepository;
 
     @Autowired
     private DescuentoService descuentoService;
@@ -113,9 +121,10 @@ public class CompraService implements InterfazCompraService {
             }
         }
 
-        // 5. Manejar método de entrega y punto de retiro
+        // 5. Manejar método de entrega, punto de retiro y dirección
         MetodoEntrega metodoEntrega = null;
         PuntoRetiro puntoRetiro = null;
+        Direccion direccion = null;
         double costoEnvio = 0.0;
 
         if (request.getMetodoEntregaId() != null) {
@@ -139,12 +148,20 @@ public class CompraService implements InterfazCompraService {
                 }
             }
 
-            // Si requiere dirección, validar los campos
+            // Si requiere dirección, validar que se proporcione direccionId
             if (metodoEntrega.isRequiereDireccion()) {
-                if (request.getDireccionEntrega() == null || request.getDireccionEntrega().isBlank()
-                    || request.getLocalidadEntrega() == null || request.getLocalidadEntrega().isBlank()) {
+                if (request.getDireccionId() == null) {
                     throw new IllegalArgumentException(
-                        "El método de entrega seleccionado requiere una dirección completa");
+                        "El método de entrega seleccionado requiere una dirección");
+                }
+                direccion = direccionRepository.findById(request.getDireccionId())
+                    .orElseThrow(() -> new RecursoNoEncontradoException(
+                        "Dirección no encontrada con ID: " + request.getDireccionId()));
+                
+                // Verificar que la dirección pertenece al usuario
+                if (!direccion.getUsuario().getId().equals(usuario.getId())) {
+                    throw new IllegalArgumentException(
+                        "La dirección seleccionada no pertenece al usuario actual");
                 }
             }
         }
@@ -152,11 +169,7 @@ public class CompraService implements InterfazCompraService {
         // 6. Asignar datos de entrega en la compra
         compra.setMetodoEntrega(metodoEntrega);
         compra.setPuntoRetiro(puntoRetiro);
-        compra.setDireccionEntrega(request.getDireccionEntrega());
-        compra.setLocalidadEntrega(request.getLocalidadEntrega());
-        compra.setProvinciaEntrega(request.getProvinciaEntrega());
-        compra.setCodigoPostalEntrega(request.getCodigoPostalEntrega());
-        compra.setTelefonoContacto(request.getTelefonoContacto());
+        compra.setDireccionEntrega(direccion);
         compra.setCostoEnvio(costoEnvio);
 
         // 7. Calcular total final incluyendo envío y descuento
@@ -183,4 +196,111 @@ public class CompraService implements InterfazCompraService {
     public List<Compra> obtenerTodas() {
         return compraRepository.findAll();
     }
+
+    @Override
+    public CompraResponse obtenerCompraDelUsuario(Long idCompra, String emailUsuario) {
+        Compra compra = compraRepository.findById(idCompra)
+            .orElseThrow(() -> new RuntimeException("Compra no encontrada"));
+
+        if (!compra.getUsuario().getEmail().equals(emailUsuario)) {
+            throw new RuntimeException("No tienes acceso a esta compra");
+        }
+
+        return mapearAResponse(compra);
+    }
+
+    private CompraResponse mapearAResponse(Compra compra) {
+        List<CompraItemResponse> items = compra.getItems().stream().map(item -> {
+            double precio = item.getProducto().getPrecio();
+            double subtotal = item.getCantidad() * precio;
+
+            return CompraItemResponse.builder()
+                .nombreProducto(item.getProducto().getNombre())
+                .cantidad(item.getCantidad())
+                .precioUnitario(precio)
+                .subtotal(subtotal)
+                .build();
+        }).toList();
+
+        // Mapear dirección si existe
+        DireccionResponse direccionResponse = null;
+        if (compra.getDireccionEntrega() != null) {
+            Direccion dir = compra.getDireccionEntrega();
+            direccionResponse = DireccionResponse.builder()
+                .id(dir.getId())
+                .calle(dir.getCalle())
+                .numero(dir.getNumero())
+                .piso(dir.getPiso())
+                .departamento(dir.getDepartamento())
+                .localidad(dir.getLocalidad())
+                .provincia(dir.getProvincia())
+                .codigoPostal(dir.getCodigoPostal())
+                .telefonoContacto(dir.getTelefonoContacto())
+                .build();
+        }
+
+        return CompraResponse.builder()
+            .id(compra.getId())
+            .fecha(compra.getFecha())
+            .items(items)
+            .subtotal(compra.getSubtotal())
+            .codigoDescuento(compra.getCodigoDescuento())
+            .porcentajeDescuento(compra.getPorcentajeDescuento())
+            .montoDescuento(compra.getMontoDescuento())
+            .total(compra.getTotal())
+            .metodoEntrega(compra.getMetodoEntrega() != null ? compra.getMetodoEntrega().getNombre() : null)
+            .puntoRetiro(compra.getPuntoRetiro() != null ? compra.getPuntoRetiro().getNombre() : null)
+            .direccionEntrega(direccionResponse)
+            .costoEnvio(compra.getCostoEnvio())
+            .metodoDePago(compra.getMetodoDePago())
+            .cuotas(compra.getCuotas())
+            .build();
+    }
+
+
+      public CompraAdminResponse mapearACompraAdminResponse(Compra compra) {
+    DireccionResponse direccion = null;
+    if (compra.getDireccionEntrega() != null) {
+        Direccion dir = compra.getDireccionEntrega();
+        direccion = DireccionResponse.builder()
+            .id(dir.getId())
+            .calle(dir.getCalle())
+            .numero(dir.getNumero())
+            .piso(dir.getPiso())
+            .departamento(dir.getDepartamento())
+            .localidad(dir.getLocalidad())
+            .provincia(dir.getProvincia())
+            .codigoPostal(dir.getCodigoPostal())
+            .telefonoContacto(dir.getTelefonoContacto())
+            .build();
+    }
+
+    return CompraAdminResponse.builder()
+        .id(compra.getId())
+        .fecha(compra.getFecha())
+        .nombreUsuario(compra.getUsuario().getFirstName() + " " + compra.getUsuario().getLastName())
+        .emailUsuario(compra.getUsuario().getEmail())
+        .items(compra.getItems().stream()
+            .map(item -> new CompraItemResponse(
+                item.getProducto().getNombre(),
+                item.getCantidad(),
+                item.getProducto().getPrecio(),
+                item.getCantidad() * item.getProducto().getPrecio()
+            )).toList())
+        .subtotal(compra.getSubtotal())
+        .codigoDescuento(compra.getCodigoDescuento())
+        .porcentajeDescuento(compra.getPorcentajeDescuento())
+        .montoDescuento(compra.getMontoDescuento())
+        .metodoEntrega(compra.getMetodoEntrega() != null ? compra.getMetodoEntrega().getNombre() : null)
+        .puntoRetiro(compra.getPuntoRetiro() != null ? compra.getPuntoRetiro().getNombre() : null)
+        .direccionEntrega(direccion)
+        .costoEnvio(compra.getCostoEnvio())
+        .total(compra.getTotal())
+        .metodoDePago(compra.getMetodoDePago())
+        .cuotas(compra.getCuotas())
+        .build();
+}
+
+
+
 }

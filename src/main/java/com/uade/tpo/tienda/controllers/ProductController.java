@@ -298,20 +298,6 @@ public class ProductController {
         return ResponseEntity.ok(responsePage);
     }
 
-    @GetMapping("/{id}/es-favorito")
-    public ResponseEntity<Boolean> verificarFavorito(
-            @PathVariable Long id,
-            Authentication authentication) {
-        
-        if (authentication == null) {
-            return ResponseEntity.ok(false);
-        }
-        
-        String email = authentication.getName();
-        boolean esFavorito = favoritosService.esFavorito(email, id);
-        
-        return ResponseEntity.ok(esFavorito);
-    }
 
     // MÉTODO HELPER PARA ADMIN - Incluye información adicional como estado activo/inactivo
     private ProductResponse mapToProductResponseForAdmin(Producto producto) {

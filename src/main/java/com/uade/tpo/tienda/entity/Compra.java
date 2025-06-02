@@ -42,30 +42,23 @@ package com.uade.tpo.tienda.entity;
     @Column(name = "monto_descuento")
     private Double montoDescuento;
     
-    // El campo 'total' tiene el total con descuento aplicado
+    // Métodos de entrega
     @ManyToOne
-   @JoinColumn(name = "metodo_entrega_id")
-   private MetodoEntrega metodoEntrega;
+    @JoinColumn(name = "metodo_entrega_id")
+    private MetodoEntrega metodoEntrega;
 
-   @ManyToOne
-   @JoinColumn(name = "punto_retiro_id")
-   private PuntoRetiro puntoRetiro;
+    @ManyToOne
+    @JoinColumn(name = "punto_retiro_id")
+    private PuntoRetiro puntoRetiro;
 
-   private String direccionEntrega;
+    // Relación con dirección en lugar de campos individuales
+    @ManyToOne
+    @JoinColumn(name = "direccion_id")
+    private Direccion direccionEntrega;
 
-   private String localidadEntrega;
-
-   private String provinciaEntrega;
-
-   @Column(name = "codigo_postal_entrega")
-   private String codigoPostalEntrega;
-
-   @Column(name = "telefono_contacto")
-   private String telefonoContacto;
-
-   @Column(name = "costo_envio")
-   private Double costoEnvio;
+    @Column(name = "costo_envio")
+    private Double costoEnvio;
    
-   private MetodoDePago metodoDePago;
-   private int cuotas;
-    }
+    private MetodoDePago metodoDePago;
+    private int cuotas;
+}

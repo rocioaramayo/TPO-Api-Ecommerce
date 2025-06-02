@@ -44,6 +44,13 @@ public ResponseEntity<Void> guardarMetodoDelUsuario(
     return ResponseEntity.ok().build();
 }
 
+@GetMapping("/usuario/metodos")
+public ResponseEntity<List<MetodoEntregaResponse>> obtenerMetodosDelUsuario(Authentication authentication) {
+    String email = authentication.getName();
+    return ResponseEntity.ok(entregaService.obtenerMetodosDelUsuario(email));
+}
+
+
     
     @GetMapping("/metodos")
     public ResponseEntity<List<MetodoEntregaResponse>> obtenerMetodosEntrega() {
