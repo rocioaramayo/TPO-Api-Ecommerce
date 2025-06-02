@@ -39,6 +39,9 @@ public class Direccion {
     @ManyToOne
     @JoinColumn(name = "usuario_id")
     private Usuario usuario; // cada dirección pertenece a un usuario
+
+    @Builder.Default
+    private boolean estaActiva = true; // Nueva: indica si la dirección está activa
 }
 
 

@@ -12,8 +12,6 @@ public interface DireccionService {
 
  List<DireccionResponse> obtenerDireccionesDelUsuario(String email);
     void guardarDireccion(String email, DireccionRequest request);
-
-
-
+    void desactivarDireccion(Long id);
     
 }

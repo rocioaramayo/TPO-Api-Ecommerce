@@ -30,4 +30,9 @@ public class DireccionController {
         direccionService.guardarDireccion(email, request);
         return ResponseEntity.ok().build();
     }
+    @PutMapping("/{id}/desactivar")
+    public ResponseEntity<String> desactivarDireccion(@PathVariable Long id) {
+        direccionService.desactivarDireccion(id);
+        return ResponseEntity.ok("Dirección desactivada correctamente.");
+    }
 }

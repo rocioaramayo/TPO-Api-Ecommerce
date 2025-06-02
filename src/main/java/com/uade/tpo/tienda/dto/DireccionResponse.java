@@ -19,4 +19,5 @@ public class DireccionResponse {
     private String provincia;
     private String codigoPostal;
     private String telefonoContacto;
+    private boolean estaActiva;
 }

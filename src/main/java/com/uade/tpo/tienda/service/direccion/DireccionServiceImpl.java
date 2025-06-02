@@ -20,7 +20,7 @@ public class DireccionServiceImpl implements DireccionService {
 
     @Override
     public List<DireccionResponse> obtenerDireccionesDelUsuario(String email) {
-        return direccionRepository.findAllByUsuarioEmail(email).stream()
+        return direccionRepository.findAllByUsuarioEmailAndEstaActivaTrue(email).stream()
                 .map(this::mapear)
                 .toList();
     }
@@ -42,6 +42,16 @@ public class DireccionServiceImpl implements DireccionService {
                 .usuario(usuario)
                 .build();
 
+        direccion.setEstaActiva(true);
+
+        direccionRepository.save(direccion);
+    }
+
+    @Override
+    public void desactivarDireccion(Long id) {
+        Direccion direccion = direccionRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Dirección no encontrada"));
+        direccion.setEstaActiva(false);
         direccionRepository.save(direccion);
     }
 
@@ -56,6 +66,7 @@ public class DireccionServiceImpl implements DireccionService {
                 .provincia(dir.getProvincia())
                 .codigoPostal(dir.getCodigoPostal())
                 .telefonoContacto(dir.getTelefonoContacto())
+                .estaActiva(dir.isEstaActiva())
                 .build();
     }
 }
