@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import com.uade.tpo.tienda.dto.CompraAdminResponse;
 import com.uade.tpo.tienda.dto.CompraItemRequest;
 import com.uade.tpo.tienda.dto.CompraItemResponse;
 import com.uade.tpo.tienda.dto.CompraRequest;
@@ -255,4 +256,51 @@ public class CompraService implements InterfazCompraService {
             .cuotas(compra.getCuotas())
             .build();
     }
+
+
+      public CompraAdminResponse mapearACompraAdminResponse(Compra compra) {
+    DireccionResponse direccion = null;
+    if (compra.getDireccionEntrega() != null) {
+        Direccion dir = compra.getDireccionEntrega();
+        direccion = DireccionResponse.builder()
+            .id(dir.getId())
+            .calle(dir.getCalle())
+            .numero(dir.getNumero())
+            .piso(dir.getPiso())
+            .departamento(dir.getDepartamento())
+            .localidad(dir.getLocalidad())
+            .provincia(dir.getProvincia())
+            .codigoPostal(dir.getCodigoPostal())
+            .telefonoContacto(dir.getTelefonoContacto())
+            .build();
+    }
+
+    return CompraAdminResponse.builder()
+        .id(compra.getId())
+        .fecha(compra.getFecha())
+        .nombreUsuario(compra.getUsuario().getFirstName() + " " + compra.getUsuario().getLastName())
+        .emailUsuario(compra.getUsuario().getEmail())
+        .items(compra.getItems().stream()
+            .map(item -> new CompraItemResponse(
+                item.getProducto().getNombre(),
+                item.getCantidad(),
+                item.getProducto().getPrecio(),
+                item.getCantidad() * item.getProducto().getPrecio()
+            )).toList())
+        .subtotal(compra.getSubtotal())
+        .codigoDescuento(compra.getCodigoDescuento())
+        .porcentajeDescuento(compra.getPorcentajeDescuento())
+        .montoDescuento(compra.getMontoDescuento())
+        .metodoEntrega(compra.getMetodoEntrega() != null ? compra.getMetodoEntrega().getNombre() : null)
+        .puntoRetiro(compra.getPuntoRetiro() != null ? compra.getPuntoRetiro().getNombre() : null)
+        .direccionEntrega(direccion)
+        .costoEnvio(compra.getCostoEnvio())
+        .total(compra.getTotal())
+        .metodoDePago(compra.getMetodoDePago())
+        .cuotas(compra.getCuotas())
+        .build();
+}
+
+
+
 }
