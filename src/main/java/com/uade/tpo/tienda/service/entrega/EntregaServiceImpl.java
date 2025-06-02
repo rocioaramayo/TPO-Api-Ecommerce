@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.uade.tpo.tienda.repository.MetodoEntregaUsuarioRepository;
@@ -108,13 +109,30 @@ public List<MetodoEntregaResponse> obtenerMetodosDelUsuario(String email) {
         return mapToMetodoEntregaResponse(updated);
     }
     
+
+    @Override
+    @Transactional
+    public void activarMetodoDeEntrega(Long id){
+        Optional<MetodoEntrega> metodOptional = metodoEntregaRepository.findById(id); 
+        if (!metodOptional.isPresent()) {
+            throw new RecursoNoEncontradoException("Método de entrega no encontrado con ID: " + id);
+        }
+        MetodoEntrega metodo = metodOptional.get();
+        metodo.setActivo(true);
+        metodoEntregaRepository.save(metodo);
+    }
+
     @Override
     @Transactional
     public void eliminarMetodoEntrega(Long id) {
-        if (!metodoEntregaRepository.existsById(id)) {
+        Optional<MetodoEntrega> metodOptional = metodoEntregaRepository.findById(id);
+
+        if (!metodOptional.isPresent()) {
             throw new RecursoNoEncontradoException("Método de entrega no encontrado con ID: " + id);
         }
-        metodoEntregaRepository.deleteById(id);
+        MetodoEntrega metodo = metodOptional.get();
+        metodo.setActivo(false);
+        metodoEntregaRepository.save(metodo);
     }
     
     @Override
@@ -211,11 +229,27 @@ public List<MetodoEntregaResponse> obtenerMetodosDelUsuario(String email) {
     
     @Override
     @Transactional
-    public void eliminarPuntoRetiro(Long id) {
-        if (!puntoRetiroRepository.existsById(id)) {
+    public void activarPuntoRetiro(Long id){
+        Optional<PuntoRetiro> puntoOptional = puntoRetiroRepository.findById(id); 
+        if (!puntoOptional.isPresent()) {
             throw new RecursoNoEncontradoException("Punto de retiro no encontrado con ID: " + id);
         }
-        puntoRetiroRepository.deleteById(id);
+        PuntoRetiro punto = puntoOptional.get();
+        punto.setActivo(true);
+        puntoRetiroRepository.save(punto);
+    }
+
+    @Override
+    @Transactional
+    public void eliminarPuntoRetiro(Long id) {
+        Optional<PuntoRetiro> puntoOptional = puntoRetiroRepository.findById(id);
+
+        if (!puntoOptional.isPresent()) {
+            throw new RecursoNoEncontradoException("Punto de entrega no encontrado con ID: " + id);
+        }
+        PuntoRetiro punto = puntoOptional.get();
+        punto.setActivo(false);
+        puntoRetiroRepository.save(punto);
     }
     
     @Override

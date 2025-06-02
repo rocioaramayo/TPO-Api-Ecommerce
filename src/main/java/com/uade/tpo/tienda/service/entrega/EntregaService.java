@@ -9,6 +9,7 @@ public interface EntregaService {
     // Métodos para MetodoEntrega
     MetodoEntregaResponse crearMetodoEntrega(MetodoEntregaRequest request);
     MetodoEntregaResponse actualizarMetodoEntrega(Long id, MetodoEntregaRequest request);
+    void activarMetodoDeEntrega(Long id);
     void eliminarMetodoEntrega(Long id);
     List<MetodoEntregaResponse> obtenerMetodosEntrega();
     List<MetodoEntregaResponse> obtenerMetodosEntregaActivos();
@@ -17,6 +18,7 @@ public interface EntregaService {
     // Métodos para PuntoRetiro
     PuntoRetiroResponse crearPuntoRetiro(PuntoRetiroRequest request);
     PuntoRetiroResponse actualizarPuntoRetiro(Long id, PuntoRetiroRequest request);
+    void activarPuntoRetiro(Long id);
     void eliminarPuntoRetiro(Long id);
     List<PuntoRetiroResponse> obtenerPuntosRetiro();
     List<PuntoRetiroResponse> obtenerPuntosRetiroActivos();

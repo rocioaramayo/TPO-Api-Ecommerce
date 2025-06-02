@@ -13,6 +13,10 @@ import org.springframework.security.core.Authentication;
 import java.net.URI;
 import java.util.List;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PathVariable;
+
 
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
@@ -56,13 +60,19 @@ public ResponseEntity<Void> guardarMetodoDelUsuario(
         return ResponseEntity.ok(entregaService.obtenerMetodoEntregaPorId(id));
     }
     
-    @PutMapping("/metodos/{id}")
-    public ResponseEntity<MetodoEntregaResponse> actualizarMetodoEntrega(
-            @PathVariable Long id, 
-            @RequestBody MetodoEntregaRequest request) {
-        return ResponseEntity.ok(entregaService.actualizarMetodoEntrega(id, request));
-    }
+    // @PutMapping("/metodos/{id}")
+    // public ResponseEntity<MetodoEntregaResponse> actualizarMetodoEntrega(
+    //         @PathVariable Long id, 
+    //         @RequestBody MetodoEntregaRequest request) {
+    //     return ResponseEntity.ok(entregaService.actualizarMetodoEntrega(id, request));
+    // }
     
+    @PutMapping("metodos/{id}")
+    public ResponseEntity<Void> activarMetodoEntrega(@PathVariable Long id) {
+        entregaService.activarMetodoDeEntrega(id);
+        return ResponseEntity.noContent().build();
+    }
+
     @DeleteMapping("/metodos/{id}")
     public ResponseEntity<Void> eliminarMetodoEntrega(@PathVariable Long id) {
         entregaService.eliminarMetodoEntrega(id);
@@ -97,11 +107,16 @@ public ResponseEntity<Void> guardarMetodoDelUsuario(
         return ResponseEntity.ok(entregaService.obtenerPuntoRetiroPorId(id));
     }
     
+    // @PutMapping("/puntos/{id}")
+    // public ResponseEntity<PuntoRetiroResponse> actualizarPuntoRetiro(
+    //         @PathVariable Long id, 
+    //         @RequestBody PuntoRetiroRequest request) {
+    //     return ResponseEntity.ok(entregaService.actualizarPuntoRetiro(id, request));
+    // }
     @PutMapping("/puntos/{id}")
-    public ResponseEntity<PuntoRetiroResponse> actualizarPuntoRetiro(
-            @PathVariable Long id, 
-            @RequestBody PuntoRetiroRequest request) {
-        return ResponseEntity.ok(entregaService.actualizarPuntoRetiro(id, request));
+    public ResponseEntity<Void> activarPuntoRetiro(@PathVariable Long id) {
+        entregaService.activarPuntoRetiro(id);
+        return ResponseEntity.noContent().build();
     }
     
     @DeleteMapping("/puntos/{id}")
