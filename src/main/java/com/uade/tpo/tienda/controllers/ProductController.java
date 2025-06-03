@@ -230,9 +230,9 @@ public class ProductController {
     }
     
     @PutMapping("stock/{id}")
-    public ResponseEntity<Producto> updateStockProduct (@PathVariable Long id, @RequestBody StockRequest stockRequest) {
+    public ResponseEntity<ProductResponse> updateStockProduct (@PathVariable Long id, @RequestBody StockRequest stockRequest) {
         Producto updated = productService.updateStockProduct(id, stockRequest.getStock());
-        return ResponseEntity.ok(updated);
+        return ResponseEntity.ok(mapToProductResponse(updated));
     }
 
     // MÉTODO HELPER - Convierte Blob a Base64 para mostrar en frontend
