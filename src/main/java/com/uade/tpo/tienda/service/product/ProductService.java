@@ -32,4 +32,6 @@ public interface ProductService {
   Producto saveProductWithImages(Producto producto) throws IOException;
   List<String> getTiposCueroDisponibles();
   List<String> getColoresDisponibles();
+  void eliminarFotoDeProducto(Long productoId, Long fotoId);
+  void agregarFotoAProducto(Long productoId, org.springframework.web.multipart.MultipartFile file) throws java.io.IOException, java.sql.SQLException;
 }

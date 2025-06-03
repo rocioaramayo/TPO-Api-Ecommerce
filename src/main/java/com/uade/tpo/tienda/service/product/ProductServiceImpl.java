@@ -1,5 +1,9 @@
 package com.uade.tpo.tienda.service.product;
 
+import org.springframework.web.multipart.MultipartFile;
+import java.io.IOException;
+import java.sql.SQLException;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -271,6 +275,31 @@ public List<String> getColoresDisponibles() {
 
         }else{
             throw new ProductoNoEncontradoException();
+        }
+    }
+    // Eliminar una foto específica de un producto
+    @Override
+    public void eliminarFotoDeProducto(Long productoId, Long fotoId) {
+        Producto producto = getProductById(productoId);
+        producto.getFotos().removeIf(foto -> foto.getId().equals(fotoId));
+        // Si usás orphanRemoval=true en JPA, esto borra la foto de la DB automáticamente al guardar el producto
+        updateProductWithImages(producto);
+    }
+
+    // Agregar una foto a un producto existente
+    @Override
+    public void agregarFotoAProducto(Long productoId, MultipartFile file) throws IOException, SQLException {
+        Producto producto = getProductById(productoId);
+        if (file != null && !file.isEmpty()) {
+            byte[] bytes = file.getBytes();
+            javax.sql.rowset.serial.SerialBlob blob = new javax.sql.rowset.serial.SerialBlob(bytes);
+
+            FotoProducto foto = FotoProducto.builder()
+                    .image(blob)
+                    .producto(producto)
+                    .build();
+            producto.getFotos().add(foto);
+            updateProductWithImages(producto);
         }
     }
 }

@@ -349,4 +349,25 @@ public class ProductController {
             .build();
     }
 
+    // Endpoint para eliminar una foto específica de un producto
+    @DeleteMapping("/{productoId}/fotos/{fotoId}")
+    public ResponseEntity<Void> eliminarFotoDeProducto(
+            @PathVariable Long productoId,
+            @PathVariable Long fotoId) {
+        productService.eliminarFotoDeProducto(productoId, fotoId);
+        return ResponseEntity.noContent().build();
+    }
+
+    // Endpoint para agregar una foto a un producto existente
+    @PostMapping("/{productoId}/fotos")
+    public ResponseEntity<Void> agregarFotoAProducto(
+            @PathVariable Long productoId,
+            @RequestParam("file") MultipartFile file) {
+        try {
+            productService.agregarFotoAProducto(productoId, file);
+            return ResponseEntity.ok().build();
+        } catch (IOException | SQLException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 }
