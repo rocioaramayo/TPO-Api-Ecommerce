@@ -129,22 +129,20 @@ public class ProductController {
             if (files != null && files.length > 0) {
                 // Limpiar imágenes existentes
                 productoExistente.getFotos().clear();
-                
-                // Procesar nuevas imágenes
-                List<FotoProducto> nuevasFotos = new ArrayList<>();
+
+                // Agregar nuevas imágenes a la MISMA colección
                 for (MultipartFile file : files) {
                     if (!file.isEmpty()) {
                         byte[] bytes = file.getBytes();
                         javax.sql.rowset.serial.SerialBlob blob = new javax.sql.rowset.serial.SerialBlob(bytes);
-                        
+
                         FotoProducto foto = FotoProducto.builder()
                                 .image(blob)
                                 .producto(productoExistente)
                                 .build();
-                        nuevasFotos.add(foto);
+                        productoExistente.getFotos().add(foto);
                     }
                 }
-                productoExistente.setFotos(nuevasFotos);
             }
             // Si no se envían archivos, mantener las imágenes existentes
             
