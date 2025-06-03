@@ -1,6 +1,6 @@
 package com.uade.tpo.tienda.controllers;
 
-// Imports existentes...
+
 import com.uade.tpo.tienda.dto.PhotoResponse;
 import com.uade.tpo.tienda.dto.ProductDTO;
 import com.uade.tpo.tienda.dto.ProductPageResponse;
@@ -12,14 +12,11 @@ import com.uade.tpo.tienda.entity.Producto;
 
 import com.uade.tpo.tienda.service.product.ProductService;
 import com.uade.tpo.tienda.service.category.CategoryService;
-import com.uade.tpo.tienda.service.favoritos.FavoritosService;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -40,10 +37,7 @@ public class ProductController {
     @Autowired 
     private ProductService productService;
     @Autowired
-    private CategoryService categoryService;
-    @Autowired
-    private FavoritosService favoritosService;
-    
+    private CategoryService categoryService;    
     // CREAR PRODUCTO - Exactamente como la profesora
     @PostMapping("/upload")
     public ResponseEntity<String> uploadProductWithImages(@ModelAttribute ProductDTO productDTO,

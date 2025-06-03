@@ -1,4 +1,3 @@
-
 package com.uade.tpo.tienda.controllers;
 
 import com.uade.tpo.tienda.dto.*;
@@ -6,7 +5,6 @@ import com.uade.tpo.tienda.service.entrega.EntregaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.security.core.Authentication;
 
 
 
@@ -33,23 +31,6 @@ public class EntregaController {
         MetodoEntregaResponse response = entregaService.crearMetodoEntrega(request);
         return ResponseEntity.created(URI.create("/entregas/metodos/" + response.getId())).body(response);
     }
-
-    @PostMapping("/metodos/usuario")
-public ResponseEntity<Void> guardarMetodoDelUsuario(
-        @RequestBody MetodoUsuarioRequest request,
-        Authentication authentication) {
-
-    String email = authentication.getName();
-    entregaService.guardarMetodoDelUsuario(email, request.getMetodoEntregaId());
-    return ResponseEntity.ok().build();
-}
-
-@GetMapping("/usuario/metodos")
-public ResponseEntity<List<MetodoEntregaResponse>> obtenerMetodosDelUsuario(Authentication authentication) {
-    String email = authentication.getName();
-    return ResponseEntity.ok(entregaService.obtenerMetodosDelUsuario(email));
-}
-
 
     
     @GetMapping("/metodos")

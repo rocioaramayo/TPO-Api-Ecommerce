@@ -2,13 +2,10 @@ package com.uade.tpo.tienda.service.entrega;
 
 import com.uade.tpo.tienda.dto.*;
 import com.uade.tpo.tienda.entity.MetodoEntrega;
-import com.uade.tpo.tienda.entity.MetodoEntregaUsuario;
 import com.uade.tpo.tienda.entity.PuntoRetiro;
-import com.uade.tpo.tienda.entity.Usuario;
 import com.uade.tpo.tienda.exceptions.RecursoNoEncontradoException;
 import com.uade.tpo.tienda.repository.MetodoEntregaRepository;
 import com.uade.tpo.tienda.repository.PuntoRetiroRepository;
-import com.uade.tpo.tienda.repository.UsuarioRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,16 +15,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import com.uade.tpo.tienda.repository.MetodoEntregaUsuarioRepository;
 
 @Service
 public class EntregaServiceImpl implements EntregaService {
-
-    @Autowired
-    private MetodoEntregaUsuarioRepository metodoEntregaUsuarioRepository;
-
-    @Autowired
-    private UsuarioRepository usuarioRepository;
 
     
     @Autowired
@@ -42,31 +32,6 @@ public class EntregaServiceImpl implements EntregaService {
     // Implementación de métodos para MetodoEntrega
 
 
-    @Override
-@Transactional
-public void guardarMetodoDelUsuario(String email, Long metodoEntregaId) {
-    Usuario usuario = usuarioRepository.findByEmail(email)
-            .orElseThrow(() -> new RecursoNoEncontradoException("Usuario no encontrado: " + email));
-    MetodoEntrega metodo = metodoEntregaRepository.findById(metodoEntregaId)
-            .orElseThrow(() -> new RecursoNoEncontradoException("Método no encontrado: " + metodoEntregaId));
-
-    MetodoEntregaUsuario relacion = MetodoEntregaUsuario.builder()
-            .usuario(usuario)
-            .metodoEntrega(metodo)
-            .build();
-
-    metodoEntregaUsuarioRepository.save(relacion);
-}
-
-@Override
-public List<MetodoEntregaResponse> obtenerMetodosDelUsuario(String email) {
-    Usuario usuario = usuarioRepository.findByEmail(email)
-            .orElseThrow(() -> new RecursoNoEncontradoException("Usuario no encontrado: " + email));
-    return metodoEntregaUsuarioRepository.findByUsuario(usuario)
-            .stream()
-            .map(rel -> mapToMetodoEntregaResponse(rel.getMetodoEntrega()))
-            .toList();
-}
 
 
 

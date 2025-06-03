@@ -8,19 +8,14 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 import org.springframework.web.bind.annotation.*;
 
-import com.uade.tpo.tienda.dto.CompraAdminResponse;
 import com.uade.tpo.tienda.dto.UsuarioResponse;
 import com.uade.tpo.tienda.dto.UsuarioUpdateRequest;
-import com.uade.tpo.tienda.entity.Compra;
 import com.uade.tpo.tienda.entity.Usuario;
 import com.uade.tpo.tienda.service.Usuario.UserService;
-import com.uade.tpo.tienda.service.compra.CompraService;
-
 
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
@@ -29,9 +24,6 @@ public class UserController {
     @Autowired
     private UserService userService ;
 
-
-    @Autowired
-private CompraService compraService;
 
     @GetMapping
     public ResponseEntity<List<UsuarioResponse>> listAll() {
