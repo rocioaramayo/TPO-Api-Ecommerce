@@ -14,6 +14,7 @@ import com.uade.tpo.tienda.entity.Usuario;
 import com.uade.tpo.tienda.exceptions.ProductoNoEncontradoException;
 import com.uade.tpo.tienda.exceptions.UsuarioNoAutorizadoException;
 import com.uade.tpo.tienda.exceptions.UsuarioNoEncontradoException;
+import com.uade.tpo.tienda.exceptions.ReviewYaExisteException;
 import com.uade.tpo.tienda.repository.CompraRepository;
 import com.uade.tpo.tienda.repository.ProductRepository;
 import com.uade.tpo.tienda.repository.ReviewRepository;
@@ -42,17 +43,29 @@ public class ReviewServiceImpl implements ReviewService {
         Producto producto = productRepository.findById(request.getProductoId())
             .orElseThrow(() -> new ProductoNoEncontradoException());
 
+        // Verificar si el usuario compró el producto
         boolean compro = compraRepository.existsByUsuarioAndItemsProducto(usuario, producto);
         if (!compro) {
             throw new UsuarioNoAutorizadoException();
         }
 
-            
+        // Verificar si ya existe una review del usuario para este producto
+        boolean yaExisteReview = reviewRepository.existsByUsuarioAndProducto(usuario, producto);
+        if (yaExisteReview) {
+            throw new ReviewYaExisteException();
+        }
+
+        // Procesar el título: si está vacío o solo espacios, guardar como null
+        String titulo = request.getTitulo();
+        if (titulo != null && titulo.trim().isEmpty()) {
+            titulo = null;
+        }
 
         Review review = Review.builder()
             .usuario(usuario)
             .producto(producto)
             .estrellas(request.getEstrellas())
+            .titulo(titulo) // Guardar el título procesado
             .comentario(request.getComentario())
             .fecha(LocalDateTime.now())
             .build();
@@ -67,8 +80,10 @@ public class ReviewServiceImpl implements ReviewService {
 
         return reviewRepository.findByProducto(producto).stream().map(r ->
             ReviewResponse.builder()
-                .usuario(r.getUsuario().getLoginName())
-                .estrellas(r.getEstrellas())
+                .id(r.getId())
+                .nombreUsuario(r.getUsuario().getLoginName())
+                .rating(r.getEstrellas())  // Mapear estrellas -> rating
+                .titulo(r.getTitulo())     // Incluir el título
                 .comentario(r.getComentario())
                 .fecha(r.getFecha().toString())
                 .build()

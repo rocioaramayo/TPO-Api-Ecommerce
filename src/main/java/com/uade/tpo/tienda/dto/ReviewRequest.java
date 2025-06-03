@@ -10,4 +10,5 @@ public class ReviewRequest {
     private Long productoId;
     private int estrellas;
     private String comentario;
+    private String titulo; 
 }

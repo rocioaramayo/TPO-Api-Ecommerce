@@ -11,6 +11,6 @@ import com.uade.tpo.tienda.entity.Usuario;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {
     List<Review> findByProducto(Producto producto);
-
+    
     boolean existsByUsuarioAndProducto(Usuario usuario, Producto producto);
 }

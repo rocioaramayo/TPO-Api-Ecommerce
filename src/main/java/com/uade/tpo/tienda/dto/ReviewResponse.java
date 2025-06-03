@@ -7,8 +7,10 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class ReviewResponse {
-    private String usuario;
-    private int estrellas;
+    private Long id;
+    private String nombreUsuario;  
+    private Integer rating;       
     private String comentario;
     private String fecha;
+    private String titulo;        
 }

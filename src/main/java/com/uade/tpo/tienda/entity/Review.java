@@ -27,4 +27,7 @@ public class Review {
     private String comentario;
 
     private LocalDateTime fecha;
+
+    @Column(length = 100) // Título opcional con máximo 100 caracteres
+    private String titulo;
 }
