@@ -157,6 +157,18 @@ public class ProductController {
             return new ResponseEntity<>("Error al actualizar producto: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+        @GetMapping("/tipos-cuero")
+        public ResponseEntity<List<String>> getTiposCuero() {
+            List<String> tiposCuero = productService.getTiposCueroDisponibles();
+            return ResponseEntity.ok(tiposCuero);
+        }
+
+        @GetMapping("/colores")
+        public ResponseEntity<List<String>> getColores() {
+            List<String> colores = productService.getColoresDisponibles();
+            return ResponseEntity.ok(colores);
+        }
     // NUEVO ENDPOINT SOLO PARA ADMIN
     @GetMapping("/admin")
     public ResponseEntity<ProductPageResponse> getProductsForAdmin(

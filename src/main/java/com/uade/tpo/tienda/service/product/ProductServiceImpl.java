@@ -127,7 +127,27 @@ public class ProductServiceImpl implements ProductService{
 
         return producto;
     }
+    @Override
+public List<String> getTiposCueroDisponibles() {
+    return productRepository.findAll()
+        .stream()
+        .filter(producto -> producto.isActivo() && producto.getTipoCuero() != null && !producto.getTipoCuero().trim().isEmpty())
+        .map(Producto::getTipoCuero)
+        .distinct()
+        .sorted()
+        .collect(Collectors.toList());
+}
 
+@Override
+public List<String> getColoresDisponibles() {
+    return productRepository.findAll()
+        .stream()
+        .filter(producto -> producto.isActivo() && producto.getColor() != null && !producto.getColor().trim().isEmpty())
+        .map(Producto::getColor)
+        .distinct()
+        .sorted()
+        .collect(Collectors.toList());
+}
     @Override
     public Page<Producto> filtrarProductosOrdenados(
         String nombre, Long categoriaId, 
