@@ -74,6 +74,14 @@ public List<MetodoEntregaResponse> obtenerMetodosDelUsuario(String email) {
     @Override
     @Transactional
     public MetodoEntregaResponse crearMetodoEntrega(MetodoEntregaRequest request) {
+        // Control único para método de retiro
+        if (request.getRequierePuntoRetiro() != null && request.getRequierePuntoRetiro()) {
+            Optional<MetodoEntrega> existente = metodoEntregaRepository.findFirstByRequierePuntoRetiroTrue();
+            if (existente.isPresent()) {
+                throw new IllegalArgumentException("Ya existe un método de entrega de tipo Punto de Retiro");
+            }
+        }
+
         MetodoEntrega metodoEntrega = MetodoEntrega.builder()
                 .nombre(request.getNombre())
                 .descripcion(request.getDescripcion())
@@ -83,7 +91,7 @@ public List<MetodoEntregaResponse> obtenerMetodosDelUsuario(String email) {
                 .requierePuntoRetiro(request.getRequierePuntoRetiro())
                 .activo(request.getActivo() != null ? request.getActivo() : true)
                 .build();
-        
+
         MetodoEntrega saved = metodoEntregaRepository.save(metodoEntrega);
         return mapToMetodoEntregaResponse(saved);
     }
