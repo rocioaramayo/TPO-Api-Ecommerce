@@ -2,6 +2,7 @@ package com.uade.tpo.tienda.service.compra;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,8 @@ import com.uade.tpo.tienda.dto.CompraRequest;
 import com.uade.tpo.tienda.dto.CompraResponse;
 import com.uade.tpo.tienda.dto.DescuentoAplicadoResponse;
 import com.uade.tpo.tienda.dto.DireccionResponse;
+import com.uade.tpo.tienda.dto.PhotoResponse;
+import com.uade.tpo.tienda.dto.PuntoRetiroResponse;
 import com.uade.tpo.tienda.dto.ValidarDescuentoRequest;
 import com.uade.tpo.tienda.entity.Compra;
 import com.uade.tpo.tienda.entity.CompraItem;
@@ -211,16 +214,33 @@ public class CompraService implements InterfazCompraService {
 
     private CompraResponse mapearAResponse(Compra compra) {
         List<CompraItemResponse> items = compra.getItems().stream().map(item -> {
-            double precio = item.getProducto().getPrecio();
-            double subtotal = item.getCantidad() * precio;
+    var producto = item.getProducto();
 
-            return CompraItemResponse.builder()
-                .nombreProducto(item.getProducto().getNombre())
-                .cantidad(item.getCantidad())
-                .precioUnitario(precio)
-                .subtotal(subtotal)
+    List<PhotoResponse> fotos = producto.getFotos().stream()
+        .map(foto -> {
+            byte[] bytes;
+            try {
+                bytes = foto.getImage().getBytes(1, (int) foto.getImage().length());
+            } catch (Exception e) {
+                bytes = new byte[0]; // fallback si hay error con el BLOB
+            }
+
+            return PhotoResponse.builder()
+                .id(foto.getId())
+                .file(Base64.getEncoder().encodeToString(bytes))
                 .build();
-        }).toList();
+        })
+        .toList();
+
+    return CompraItemResponse.builder()
+        .nombreProducto(producto.getNombre())
+        .cantidad(item.getCantidad())
+        .precioUnitario(producto.getPrecio())
+        .subtotal(item.getCantidad() * producto.getPrecio())
+        .fotos(fotos)
+        .build();
+}).toList();
+
 
         // Mapear dirección si existe
         DireccionResponse direccionResponse = null;
@@ -249,7 +269,22 @@ public class CompraService implements InterfazCompraService {
             .montoDescuento(compra.getMontoDescuento())
             .total(compra.getTotal())
             .metodoEntrega(compra.getMetodoEntrega() != null ? compra.getMetodoEntrega().getNombre() : null)
-            .puntoRetiro(compra.getPuntoRetiro() != null ? compra.getPuntoRetiro().getNombre() : null)
+            .puntoRetiro(compra.getPuntoRetiro() != null ? PuntoRetiroResponse.builder()
+    .id(compra.getPuntoRetiro().getId())
+    .nombre(compra.getPuntoRetiro().getNombre())
+    .descripcion(compra.getPuntoRetiro().getDescripcion())
+    .direccion(compra.getPuntoRetiro().getDireccion())
+    .localidad(compra.getPuntoRetiro().getLocalidad())
+    .provincia(compra.getPuntoRetiro().getProvincia())
+    .codigoPostal(compra.getPuntoRetiro().getCodigoPostal())
+    .horarioAtencion(compra.getPuntoRetiro().getHorarioAtencion())
+    .telefono(compra.getPuntoRetiro().getTelefono())
+    .email(compra.getPuntoRetiro().getEmail())
+    .coordenadas(compra.getPuntoRetiro().getCoordenadas())
+    .metodoEntrega(compra.getPuntoRetiro().getMetodoEntrega().getNombre())
+    .metodoEntregaId(compra.getPuntoRetiro().getMetodoEntrega().getId())
+    .activo(compra.getPuntoRetiro().isActivo())
+    .build() : null)
             .direccionEntrega(direccionResponse)
             .costoEnvio(compra.getCostoEnvio())
             .metodoDePago(compra.getMetodoDePago())
@@ -281,12 +316,36 @@ public class CompraService implements InterfazCompraService {
         .nombreUsuario(compra.getUsuario().getFirstName() + " " + compra.getUsuario().getLastName())
         .emailUsuario(compra.getUsuario().getEmail())
         .items(compra.getItems().stream()
-            .map(item -> new CompraItemResponse(
-                item.getProducto().getNombre(),
-                item.getCantidad(),
-                item.getProducto().getPrecio(),
-                item.getCantidad() * item.getProducto().getPrecio()
-            )).toList())
+    .map(item -> {
+        var producto = item.getProducto();
+
+        List<PhotoResponse> fotos = producto.getFotos().stream()
+            .map(foto -> {
+                byte[] bytes;
+                try {
+                    bytes = foto.getImage().getBytes(1, (int) foto.getImage().length());
+                } catch (Exception e) {
+                    bytes = new byte[0]; // fallback si hay error con el BLOB
+                }
+
+                return PhotoResponse.builder()
+                    .id(foto.getId())
+                    .file(Base64.getEncoder().encodeToString(bytes))
+                    .build();
+            })
+            .toList();
+
+        return CompraItemResponse.builder()
+            .productoId(producto.getId())
+            .nombreProducto(producto.getNombre())
+            .cantidad(item.getCantidad())
+            .precioUnitario(producto.getPrecio())
+            .subtotal(item.getCantidad() * producto.getPrecio())
+            .fotos(fotos)
+            .build();
+    })
+    .toList())
+
         .subtotal(compra.getSubtotal())
         .codigoDescuento(compra.getCodigoDescuento())
         .porcentajeDescuento(compra.getPorcentajeDescuento())

@@ -1,6 +1,7 @@
 package com.uade.tpo.tienda.controllers;
  
- import java.util.List;
+ import java.util.Base64;
+import java.util.List;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -19,6 +20,8 @@ import com.uade.tpo.tienda.dto.CompraItemResponse;
 import com.uade.tpo.tienda.dto.CompraRequest;
 import com.uade.tpo.tienda.dto.CompraResponse;
 import com.uade.tpo.tienda.dto.DireccionResponse;
+import com.uade.tpo.tienda.dto.PhotoResponse;
+import com.uade.tpo.tienda.dto.PuntoRetiroResponse;
 import com.uade.tpo.tienda.entity.Compra;
 import com.uade.tpo.tienda.entity.Direccion;
  
@@ -95,13 +98,37 @@ private CompraResponse mapearACompraResponse(Compra compra) {
         .id(compra.getId())
         .fecha(compra.getFecha())
         .items(compra.getItems().stream()
-            .map(item -> new CompraItemResponse(
-                item.getProducto().getNombre(),
-                item.getCantidad(),
-                item.getProducto().getPrecio(),
-                item.getCantidad() * item.getProducto().getPrecio()
-            ))
-            .toList())
+    .map(item -> {
+        var producto = item.getProducto();
+
+        List<PhotoResponse> fotos = producto.getFotos().stream()
+            .map(foto -> {
+                byte[] bytes;
+                try {
+                    bytes = foto.getImage().getBytes(1, (int) foto.getImage().length());
+                } catch (Exception e) {
+                    bytes = new byte[0]; // fallback si hay error con el BLOB
+                }
+
+                return PhotoResponse.builder()
+                    .id(foto.getId())
+                    .file(Base64.getEncoder().encodeToString(bytes))
+                    .build();
+            })
+            .toList();
+
+        return CompraItemResponse.builder()
+            .productoId(producto.getId())
+            .nombreProducto(producto.getNombre())
+            .cantidad(item.getCantidad())
+            .precioUnitario(producto.getPrecio())
+            .subtotal(item.getCantidad() * producto.getPrecio())
+            .fotos(fotos)
+            .build();
+    })
+    .toList())
+
+
         // Campos existentes para descuentos
         .subtotal(compra.getSubtotal())
         .codigoDescuento(compra.getCodigoDescuento())
@@ -109,7 +136,22 @@ private CompraResponse mapearACompraResponse(Compra compra) {
         .montoDescuento(compra.getMontoDescuento())
         // Campos para métodos de entrega
         .metodoEntrega(compra.getMetodoEntrega() != null ? compra.getMetodoEntrega().getNombre() : null)
-        .puntoRetiro(compra.getPuntoRetiro() != null ? compra.getPuntoRetiro().getNombre() : null)
+        .puntoRetiro(compra.getPuntoRetiro() != null ? PuntoRetiroResponse.builder()
+    .id(compra.getPuntoRetiro().getId())
+    .nombre(compra.getPuntoRetiro().getNombre())
+    .descripcion(compra.getPuntoRetiro().getDescripcion())
+    .direccion(compra.getPuntoRetiro().getDireccion())
+    .localidad(compra.getPuntoRetiro().getLocalidad())
+    .provincia(compra.getPuntoRetiro().getProvincia())
+    .codigoPostal(compra.getPuntoRetiro().getCodigoPostal())
+    .horarioAtencion(compra.getPuntoRetiro().getHorarioAtencion())
+    .telefono(compra.getPuntoRetiro().getTelefono())
+    .email(compra.getPuntoRetiro().getEmail())
+    .coordenadas(compra.getPuntoRetiro().getCoordenadas())
+    .metodoEntrega(compra.getPuntoRetiro().getMetodoEntrega().getNombre())
+    .metodoEntregaId(compra.getPuntoRetiro().getMetodoEntrega().getId())
+    .activo(compra.getPuntoRetiro().isActivo())
+    .build() : null)
         // Usar la nueva estructura de dirección
         .direccionEntrega(direccionResponse)
         .costoEnvio(compra.getCostoEnvio())
