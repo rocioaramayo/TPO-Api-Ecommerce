@@ -30,7 +30,6 @@ import java.util.stream.Collectors;
 
 
 
-@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("productos")
 public class ProductController {

@@ -11,9 +11,7 @@ import com.uade.tpo.tienda.dto.ReviewRequest;
 import com.uade.tpo.tienda.dto.ReviewResponse;
 import com.uade.tpo.tienda.entity.Usuario;
 import com.uade.tpo.tienda.service.review.ReviewService;
-import org.springframework.web.bind.annotation.CrossOrigin;
 
-@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/reviews")
 public class ReviewController {

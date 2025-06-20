@@ -17,7 +17,6 @@ import com.uade.tpo.tienda.dto.UsuarioUpdateRequest;
 import com.uade.tpo.tienda.entity.Usuario;
 import com.uade.tpo.tienda.service.Usuario.UserService;
 
-@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/api/v1/users")
 public class UserController {

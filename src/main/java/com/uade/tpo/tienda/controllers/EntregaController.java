@@ -10,13 +10,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PathVariable;
 
 
-@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/entregas")
 public class EntregaController {
