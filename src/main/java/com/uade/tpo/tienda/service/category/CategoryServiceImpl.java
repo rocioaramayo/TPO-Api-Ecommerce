@@ -16,8 +16,8 @@ public class CategoryServiceImpl implements CategoryService {
     
     @Override
     public Categoria createCategory(Categoria category) {
-        if (!categoryRepository.findByDescripcion(category.getDescripcion()).isEmpty()) {
-            throw new CategoriaDuplicadaException(); // lanza excepción si está duplicada
+        if (!categoryRepository.findByNombre(category.getNombre()).isEmpty()) {
+            throw new CategoriaDuplicadaException(); // lanza excepción si el nombre está duplicado
         }
         return categoryRepository.save(category); // guarda si está todo ok
     }
