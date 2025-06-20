@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.util.List;
 
-import org.springframework.web.bind.annotation.CrossOrigin;
+
 
 @RestController
 @RequestMapping("/categories")

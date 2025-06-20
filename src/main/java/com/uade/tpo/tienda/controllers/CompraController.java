@@ -25,7 +25,7 @@ import com.uade.tpo.tienda.dto.PuntoRetiroResponse;
 import com.uade.tpo.tienda.entity.Compra;
 import com.uade.tpo.tienda.entity.Direccion;
  
- import org.springframework.web.bind.annotation.CrossOrigin;
+
 
 @RestController
  @RequestMapping("/compras")
