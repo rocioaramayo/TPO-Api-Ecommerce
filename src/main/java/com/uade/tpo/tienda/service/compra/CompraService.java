@@ -19,6 +19,7 @@ import com.uade.tpo.tienda.dto.DireccionResponse;
 import com.uade.tpo.tienda.dto.PhotoResponse;
 import com.uade.tpo.tienda.dto.PuntoRetiroResponse;
 import com.uade.tpo.tienda.dto.ValidarDescuentoRequest;
+import com.uade.tpo.tienda.dto.CotizacionEnvioRequest;
 import com.uade.tpo.tienda.entity.Compra;
 import com.uade.tpo.tienda.entity.CompraItem;
 import com.uade.tpo.tienda.entity.Direccion;
@@ -39,6 +40,7 @@ import com.uade.tpo.tienda.repository.ProductRepository;
 import com.uade.tpo.tienda.repository.PuntoRetiroRepository;
 import com.uade.tpo.tienda.repository.UsuarioRepository;
 import com.uade.tpo.tienda.service.descuento.DescuentoService;
+import com.uade.tpo.tienda.service.entrega.EntregaService;
 
 import jakarta.transaction.Transactional;
 
@@ -65,6 +67,9 @@ public class CompraService implements InterfazCompraService {
 
     @Autowired
     private PuntoRetiroRepository puntoRetiroRepository;
+
+    @Autowired
+    private EntregaService entregaService;
 
     @Transactional
     public Compra procesarCompra(CompraRequest request) {
@@ -134,7 +139,6 @@ public class CompraService implements InterfazCompraService {
             metodoEntrega = metodoEntregaRepository.findById(request.getMetodoEntregaId())
                 .orElseThrow(() -> new RecursoNoEncontradoException(
                     "Método de entrega no encontrado con ID: " + request.getMetodoEntregaId()));
-            costoEnvio = metodoEntrega.getCostoBase();
 
             // Si requiere punto de retiro, validar que venga en la request
             if (metodoEntrega.isRequierePuntoRetiro()) {
@@ -166,6 +170,13 @@ public class CompraService implements InterfazCompraService {
                     throw new IllegalArgumentException(
                         "La dirección seleccionada no pertenece al usuario actual");
                 }
+                // Calcular costo de envío usando la lógica de cotización
+                CotizacionEnvioRequest cotReq = new CotizacionEnvioRequest();
+                cotReq.setDireccion(direccion.getCalle() + " " + direccion.getNumero());
+                cotReq.setLocalidad(direccion.getLocalidad());
+                cotReq.setProvincia(direccion.getProvincia());
+                cotReq.setCodigoPostal(direccion.getCodigoPostal());
+                costoEnvio = entregaService.cotizarEnvio(cotReq).getPrecio();
             }
         }
 
