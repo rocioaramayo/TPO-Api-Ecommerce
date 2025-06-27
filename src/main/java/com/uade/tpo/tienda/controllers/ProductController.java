@@ -15,6 +15,7 @@ import com.uade.tpo.tienda.service.category.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -265,6 +266,7 @@ public class ProductController {
             .precio(producto.getPrecio())
             .stock(producto.getStock())
             .categoria(producto.getCategoria().getNombre())  
+            .categoriaId(producto.getCategoria().getId())
             .fotos(photoResponses)
             .createdAt(producto.getCreatedAt())
             .pocoStock(producto.getStock() < 5)
@@ -290,11 +292,29 @@ public class ProductController {
         @RequestParam(required = false, defaultValue = "precio") String ordenarPor,
         @RequestParam(required = false, defaultValue = "asc") String orden,
         @RequestParam(required = false, defaultValue = "0") int page,
-        @RequestParam(required = false, defaultValue = "20") int size) {
+        @RequestParam(required = false, defaultValue = "20") int size,
+        @RequestParam(required = false) Long excludeId) {
         
         Page<Producto> productosPage = productService.filtrarProductosOrdenados(
             nombre, categoriaId, tipoCuero, grosor, acabado, color, precioMin, precioMax,
             ordenarPor, orden, PageRequest.of(page, size));
+        
+        // Si se especifica excludeId, filtrar el producto de la lista
+        if (excludeId != null) {
+            List<Producto> productosFiltrados = productosPage.getContent().stream()
+                .filter(producto -> !producto.getId().equals(excludeId))
+                .collect(Collectors.toList());
+            
+            // Crear una nueva página con los productos filtrados
+            Page<Producto> productosFiltradosPage = new PageImpl<>(
+                productosFiltrados, 
+                productosPage.getPageable(), 
+                productosPage.getTotalElements() - 1
+            );
+            
+            Page<ProductResponse> responsePage = productosFiltradosPage.map(this::mapToProductResponse);
+            return ResponseEntity.ok(responsePage);
+        }
         
         Page<ProductResponse> responsePage = productosPage.map(this::mapToProductResponse);
         
@@ -329,6 +349,7 @@ public class ProductController {
             .precio(producto.getPrecio())
             .stock(producto.getStock())
             .categoria(producto.getCategoria().getNombre())  
+            .categoriaId(producto.getCategoria().getId())
             .fotos(photoResponses)
             .createdAt(producto.getCreatedAt())
             .pocoStock(producto.getStock() < 5)

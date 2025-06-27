@@ -19,6 +19,7 @@ public class ProductResponse {
     private Double precio;
     private Integer stock;
     private String categoria;
+    private Long categoriaId; // ID de la categoría para filtros
     private List<PhotoResponse> fotos;
     private LocalDateTime createdAt;
     private boolean pocoStock;
