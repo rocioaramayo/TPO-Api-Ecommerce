@@ -48,6 +48,14 @@ public class CategoryController {
        return categoria.map(ResponseEntity:: ok)
        .orElse(ResponseEntity.notFound().build());
     }
+
+    @PutMapping("/{id}")
+public ResponseEntity<Categoria> updateCategory(@PathVariable Long id, @RequestBody CategoryRequest request) {
+    Optional<Categoria> updated = categoryService.updateCategory(id, request);
+    return updated.map(ResponseEntity::ok)
+                  .orElse(ResponseEntity.notFound().build());
+}
+
     
 
 
