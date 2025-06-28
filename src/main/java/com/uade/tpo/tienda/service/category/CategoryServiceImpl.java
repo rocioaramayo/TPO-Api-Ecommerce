@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.uade.tpo.tienda.dto.CategoryRequest;
 import com.uade.tpo.tienda.entity.Categoria;
 import com.uade.tpo.tienda.exceptions.CategoriaDuplicadaException;
 import com.uade.tpo.tienda.repository.CategoryRepository;
@@ -31,4 +33,19 @@ public class CategoryServiceImpl implements CategoryService {
     public List<Categoria> getCategory() {
         return categoryRepository.findAll();
     }
+
+    public Optional<Categoria> updateCategory(Long id, CategoryRequest request) {
+    Optional<Categoria> optionalCategoria = categoryRepository.findById(id);
+
+    if (optionalCategoria.isPresent()) {
+        Categoria categoria = optionalCategoria.get();
+        categoria.setNombre(request.getNombre());
+        categoria.setDescripcion(request.getDescripcion());
+        Categoria updated = categoryRepository.save(categoria);
+        return Optional.of(updated);
+    }
+
+    return Optional.empty();
+}
+
 }
