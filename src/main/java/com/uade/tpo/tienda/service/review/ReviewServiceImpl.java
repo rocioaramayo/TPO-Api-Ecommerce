@@ -36,7 +36,7 @@ public class ReviewServiceImpl implements ReviewService {
     private CompraRepository compraRepository;
 
     @Override
-    public void dejarReview(String email, ReviewRequest request) {
+    public ReviewResponse dejarReview(String email, ReviewRequest request) {
         Usuario usuario = usuarioRepository.findByEmail(email)
             .orElseThrow(() -> new UsuarioNoEncontradoException());
 
@@ -65,12 +65,21 @@ public class ReviewServiceImpl implements ReviewService {
             .usuario(usuario)
             .producto(producto)
             .estrellas(request.getEstrellas())
-            .titulo(titulo) // Guardar el título procesado
+            .titulo(titulo)
             .comentario(request.getComentario())
             .fecha(LocalDateTime.now())
             .build();
 
         reviewRepository.save(review);
+
+        return ReviewResponse.builder()
+            .id(review.getId())
+            .nombreUsuario(usuario.getLoginName())
+            .rating(review.getEstrellas())
+            .titulo(review.getTitulo())
+            .comentario(review.getComentario())
+            .fecha(review.getFecha().toString())
+            .build();
     }
 
     @Override

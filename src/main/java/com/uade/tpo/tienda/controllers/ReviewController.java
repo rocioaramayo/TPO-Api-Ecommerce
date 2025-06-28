@@ -20,9 +20,9 @@ public class ReviewController {
     private ReviewService reviewService;
 
     @PostMapping
-    public ResponseEntity<Void> dejarReview(@AuthenticationPrincipal Usuario usuario,@RequestBody ReviewRequest request) {
-        reviewService.dejarReview(usuario.getEmail(), request);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<ReviewResponse> dejarReview(@AuthenticationPrincipal Usuario usuario, @RequestBody ReviewRequest request) {
+        ReviewResponse response = reviewService.dejarReview(usuario.getEmail(), request);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{productoId}")
