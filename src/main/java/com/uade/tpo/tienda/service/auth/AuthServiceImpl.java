@@ -126,9 +126,12 @@ public void changeOwnPassword(ChangePasswordRequest req) {
     if (!passwordEncoder.matches(req.getOldPassword(), user.getPassword())) {
         throw new IllegalArgumentException("Contraseña actual inválida");
     }
-    // guardo la nueva
-    user.setPassword(passwordEncoder.encode(req.getNewPassword()));
-    usuarioRepository.save(user);
+    if (req.getNewPassword().length() < 8){
+        throw new IllegalArgumentException("Contraseña nueva inválida");
+    }else{
+        user.setPassword(passwordEncoder.encode(req.getNewPassword()));
+        usuarioRepository.save(user);
+    }
 }
 
 @Override
