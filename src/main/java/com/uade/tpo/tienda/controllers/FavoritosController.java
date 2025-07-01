@@ -3,12 +3,16 @@ package com.uade.tpo.tienda.controllers;
 import com.uade.tpo.tienda.dto.FavoritoRequest;
 import com.uade.tpo.tienda.dto.FavoritoResponse;
 import com.uade.tpo.tienda.dto.MessageResponse;
+import com.uade.tpo.tienda.entity.Usuario;
 import com.uade.tpo.tienda.service.favoritos.FavoritosService;
+import com.uade.tpo.tienda.service.Usuario.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -20,12 +24,19 @@ public class FavoritosController {
     @Autowired
     private FavoritosService favoritosService;
 
+    @Autowired
+    private UserService userService;
+
     @PostMapping
     public ResponseEntity<FavoritoResponse> agregarFavorito(
             Authentication authentication,
             @RequestBody FavoritoRequest request) {
         
         String email = authentication.getName();
+        Usuario usuario = userService.getUsuarioByEmail(email);
+        if (usuario.getRole().name().equals("ADMIN")) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Los administradores no pueden agregar favoritos.");
+        }
         FavoritoResponse response = favoritosService.agregarFavorito(email, request.getProductoId());
         
         return ResponseEntity.ok(response);

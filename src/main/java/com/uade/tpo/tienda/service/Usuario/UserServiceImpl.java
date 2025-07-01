@@ -79,7 +79,11 @@ public UsuarioResponse updateMyProfile(Usuario usuario, UsuarioUpdateRequest req
     return mapToResponse(usuario);
 }
 
-
+    @Override
+    public Usuario getUsuarioByEmail(String email) {
+        return usuarioRepository.findByEmail(email)
+            .orElseThrow(UsuarioNoEncontradoException::new);
+    }
 
     private UsuarioResponse mapToResponse(Usuario u) {
         return new UsuarioResponse(

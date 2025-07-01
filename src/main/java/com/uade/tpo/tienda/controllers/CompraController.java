@@ -24,7 +24,11 @@ import com.uade.tpo.tienda.dto.PhotoResponse;
 import com.uade.tpo.tienda.dto.PuntoRetiroResponse;
 import com.uade.tpo.tienda.entity.Compra;
 import com.uade.tpo.tienda.entity.Direccion;
- 
+import com.uade.tpo.tienda.entity.Usuario;
+import com.uade.tpo.tienda.service.Usuario.UserService;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
+
 
 
 @RestController
@@ -37,9 +41,17 @@ import com.uade.tpo.tienda.entity.Direccion;
     @Autowired
     private CompraService compraService2;
 
+    @Autowired
+    private UserService userService;
+
     
  @PostMapping
-    public ResponseEntity<CompraResponse> realizarCompra(@RequestBody CompraRequest request) {
+    public ResponseEntity<CompraResponse> realizarCompra(Authentication authentication, @RequestBody CompraRequest request) {
+        String email = authentication.getName();
+        Usuario usuario = userService.getUsuarioByEmail(email);
+        if (usuario.getRole().name().equals("ADMIN")) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Los administradores no pueden realizar compras.");
+        }
         Compra compra = compraService.procesarCompra(request);
         CompraResponse response = mapearACompraResponse(compra);
         return ResponseEntity.ok(response);

@@ -12,4 +12,5 @@ public interface UserService {
     String habilitarUsuario(Long id);
     String deshabilitarUsuario(Long id);
     UsuarioResponse updateMyProfile(Usuario usuario, UsuarioUpdateRequest req);
+    Usuario getUsuarioByEmail(String email);
 }
