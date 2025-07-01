@@ -93,7 +93,8 @@ public class ProductController {
     public ResponseEntity<String> updateProductWithImages(
             @PathVariable Long id,
             @ModelAttribute ProductDTO productDTO,
-            @RequestParam(value = "files", required = false) MultipartFile[] files) {
+            @RequestParam(value = "files", required = false) MultipartFile[] files,
+            @RequestParam(value = "fotosAEliminar", required = false) List<Long> fotosAEliminar) {
         try {
             // Validar que la categoría existe
             Optional<Categoria> categoryOpt = categoryService.getCategoryById(productDTO.getCategoryId());
@@ -103,6 +104,11 @@ public class ProductController {
             
             // Buscar producto existente
             Producto productoExistente = productService.getProductById(id);
+            
+            // Eliminar fotos marcadas para eliminar
+            if (fotosAEliminar != null && !fotosAEliminar.isEmpty()) {
+                productoExistente.getFotos().removeIf(foto -> fotosAEliminar.contains(foto.getId()));
+            }
             
             // Actualizar campos básicos
             productoExistente.setNombre(productDTO.getNombre());

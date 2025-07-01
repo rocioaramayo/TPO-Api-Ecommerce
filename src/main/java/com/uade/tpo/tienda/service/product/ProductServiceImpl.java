@@ -51,12 +51,14 @@ public class ProductServiceImpl implements ProductService {
             producto.getStock() == null || producto.getStock() < 0 ||
             producto.getCategoria() == null) throw new FaltanDatosException();
         
-        if (producto.getFotos() != null && !producto.getFotos().isEmpty()) {
-            for (FotoProducto foto : producto.getFotos()) {
-                if (foto.getImage() == null) throw new ProductoSinImagenesException();
-            }
-            producto.getFotos().forEach(foto -> foto.setProducto(producto));
+        if (producto.getFotos() == null || producto.getFotos().isEmpty()) {
+            throw new ProductoSinImagenesException();
         }
+        
+        for (FotoProducto foto : producto.getFotos()) {
+            if (foto.getImage() == null) throw new ProductoSinImagenesException();
+        }
+        producto.getFotos().forEach(foto -> foto.setProducto(producto));
         return productRepository.save(producto);
     }
 
